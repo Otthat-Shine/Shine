@@ -1,0 +1,6 @@
+[submodule "concert/native/concert/third_party/otthat_bit7z"]
+	path = concert/native/concert/third_party/otthat_bit7z
+	url = https://github.com/Otthat-Shine/otthat_bit7z.git
+[submodule "concert/native/concert/third_party/otthat_cryptopp-cmake"]
+	path = concert/native/concert/third_party/otthat_cryptopp-cmake
+	url = https://github.com/Otthat-Shine/otthat_cryptopp-cmake.git
