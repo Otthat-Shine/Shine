@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:concert/gen/concert.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -24,26 +25,28 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text("Aes Encrypt/Decrypt Test"),
+          title: const Text("Zip Test"),
         ),
-        body: AesTest(),
+        body: ZipTest(),
       ),
     );
   }
 }
 
-class AesTest extends StatefulWidget {
-  const AesTest({super.key});
+class ZipTest extends StatefulWidget {
+  const ZipTest({super.key});
 
   @override
-  State<AesTest> createState() => _AesTestState();
+  State<ZipTest> createState() => _ZipTestState();
 }
 
-class _AesTestState extends State<AesTest> {
-  String plainText = "";
-  String decryptCipherText = "";
+class _ZipTestState extends State<ZipTest> {
+  final Concert _concert = Concert();
 
-  void _testAes() async {
+  String before = "";
+  String after = "";
+
+  void _testZip() async {
     String currentPath;
     if (Platform.isWindows) {
       currentPath = dirname(Platform.resolvedExecutable);
@@ -53,27 +56,22 @@ class _AesTestState extends State<AesTest> {
       throw "Unsupported Platform";
     }
 
-    const plainText = 'Hello, World from Flutter';
-    final testFile = File('$currentPath/test_aes.txt')
-      ..createSync()
-      ..writeAsStringSync(plainText);
-
-    Concert concert = Concert();
-    concert.func.AesEncrypt(
-      '$currentPath/test_aes.txt'.toCStr(),
-      '$currentPath/test_aes_cipher.txt'.toCStr(),
-      '12345678'.toCStr(),
-    );
-    concert.func.AesDecrypt(
-      '$currentPath/test_aes_cipher.txt'.toCStr(),
-      '$currentPath/test_aes_decrypt_cipher.txt'.toCStr(),
-      '12345678'.toCStr(),
-    );
+    final test_file = File("$currentPath/1.txt")..writeAsStringSync('Zip Test222');
+    setState(() {
+      before = test_file.readAsStringSync();
+    });
+    _concert.func.ZipCompress(
+        '$currentPath/1.txt'.toCStr(),
+        '$currentPath/1.zip'.toCStr(),
+        BitCompressionMethodCopy,
+        BitCompressionLevelNone,
+        '12345678'.toCStr());
+    test_file.deleteSync();
+    _concert.func.ZipExtract('$currentPath/1.zip'.toCStr(),
+        currentPath.toCStr(), '12345678'.toCStr());
 
     setState(() {
-      this.plainText = plainText;
-      this.decryptCipherText =
-          File('$currentPath/test_aes_decrypt_cipher.txt').readAsStringSync();
+      after = test_file.readAsStringSync();
     });
   }
 
@@ -87,18 +85,21 @@ class _AesTestState extends State<AesTest> {
           style: TextStyle(fontSize: 40),
         ),
         ElevatedButton(
-          onPressed: _testAes,
+          onPressed: _testZip,
           style: ButtonStyle(
             fixedSize: MaterialStateProperty.all(const Size(100, 100)),
           ),
-          child: const Icon(Icons.check, size: 50,),
+          child: const Icon(
+            Icons.check,
+            size: 50,
+          ),
         ),
         Text(
-          "Plain:\n$plainText",
+          "Before:\n$before",
           style: const TextStyle(fontSize: 30),
         ),
         Text(
-          'Decrypt Cipher Text:\n$decryptCipherText',
+          'After:\n$after',
           style: const TextStyle(fontSize: 30),
         ),
       ],

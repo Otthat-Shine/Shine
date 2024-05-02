@@ -36,7 +36,7 @@ if (TARGET_PLATFORM STREQUAL "test")
     foreach (file ${test})
         get_filename_component(name ${file} NAME)
 
-        add_executable("test-${name}" ${file})
+        add_executable("test-${name}" ${file} ${src})
 
         target_include_directories("test-${name}" PRIVATE "include")
         target_link_libraries("test-${name}" PRIVATE bit7z)
