@@ -10,6 +10,12 @@ extension FFIString on String {
   }
 }
 
+extension FFIPointerUtf8 on Pointer<Char> {
+  String toDartString() {
+    return (this as Pointer<Utf8>).toDartString();
+  }
+}
+
 class Concert {
   late GenConcert _genConcert;
 

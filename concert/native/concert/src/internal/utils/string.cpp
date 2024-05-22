@@ -1,17 +1,11 @@
 //
-// Created by Patrick on 2024/4/12.
+// Created by patrick on 2024/5/6.
 //
 
-#include <string>
-#include <vector>
+#include <concert/internal/utils/string.h>
 
-#include <concert/internal/string_utils.h>
-
-namespace concert {
-namespace string_utils {
-
-// Adapted from https://zhuanlan.zhihu.com/p/426939341
-void split(const std::string &str, std::vector<std::string> &tokens, const std::string &delimiter = " ") {
+namespace concert::utils::string {
+void split(const std::string &str, std::vector<std::string> &tokens, const std::string &delimiter) {
   std::size_t previous = 0;
   std::size_t current = str.find(delimiter);
 
@@ -28,6 +22,5 @@ void split(const std::string &str, std::vector<std::string> &tokens, const std::
   if (previous != str.size()) {
     tokens.push_back(str.substr(previous));
   }
-}
 }
 }

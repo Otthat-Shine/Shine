@@ -6,7 +6,7 @@
 
 #include <concert/internal/zip/compress.h>
 #include <concert/internal/bit7z_loader.h>
-#include <concert/internal/string_utils.h>
+#include <concert/internal/utils/string.h>
 
 namespace concert::zip {
 int Compress(const std::string &list_of_file,
@@ -37,7 +37,7 @@ int Compress(const std::string &list_of_file,
     BitFileCompressor compressor{*concert::Bit7zLoader::get_bit7z_lib(), BitFormat::Zip};
 
     std::vector<std::string> files;
-    concert::string_utils::split(list_of_file, files, "?");
+    concert::utils::string::split(list_of_file, files, "?");
 
     if (!password.empty()) {
       compressor.setPassword(password);

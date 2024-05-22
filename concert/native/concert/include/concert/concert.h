@@ -3,5 +3,6 @@
 
 #include "export_aes.h"
 #include "export_zip.h"
+#include "export_utils.h"
 
 #endif //CONCERT_INCLUDE_CONCERT_CONCERT_H_

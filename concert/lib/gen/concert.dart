@@ -136,6 +136,35 @@ class GenConcert {
   late final _ZipExtract = _ZipExtractPtr.asFunction<
       int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>)>();
+
+  int getFileSize(
+    ffi.Pointer<ffi.Char> path,
+  ) {
+    return _getFileSize(
+      path,
+    );
+  }
+
+  late final _getFileSizePtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<ffi.Char>)>>(
+          'getFileSize');
+  late final _getFileSize =
+      _getFileSizePtr.asFunction<int Function(ffi.Pointer<ffi.Char>)>();
+
+  ffi.Pointer<ffi.Char> getLastWriteTime(
+    ffi.Pointer<ffi.Char> path,
+  ) {
+    return _getLastWriteTime(
+      path,
+    );
+  }
+
+  late final _getLastWriteTimePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Char> Function(
+              ffi.Pointer<ffi.Char>)>>('getLastWriteTime');
+  late final _getLastWriteTime = _getLastWriteTimePtr
+      .asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>();
 }
 
 const int CONCERT_AES_INPUT_FILE_NOT_EXISTS = -1;
