@@ -9,7 +9,6 @@ if (MSVC)
 endif ()
 
 add_subdirectory(third_party/otthat_bit7z)
-add_subdirectory(third_party/otthat_cryptopp-cmake)
 add_subdirectory(third_party/otthat_libsodium)
 
 add_library(${PROJECT_NAME} SHARED)
@@ -19,7 +18,6 @@ target_sources(${PROJECT_NAME} PRIVATE ${src})
 target_include_directories(${PROJECT_NAME} PRIVATE "include")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE bit7z)
-target_link_libraries(${PROJECT_NAME} PRIVATE cryptopp)
 target_link_libraries(${PROJECT_NAME} PRIVATE libsodium)
 
 if (TARGET_PLATFORM STREQUAL "android")
@@ -42,7 +40,6 @@ if (TARGET_PLATFORM STREQUAL "test")
 
         target_include_directories("test-${name}" PRIVATE "include")
         target_link_libraries("test-${name}" PRIVATE bit7z)
-        target_link_libraries("test-${name}" PRIVATE cryptopp)
         target_link_libraries("test-${name}" PRIVATE libsodium)
     endforeach ()
 endif ()
