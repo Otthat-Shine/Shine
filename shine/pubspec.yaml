@@ -35,11 +35,17 @@ dependencies:
     path: ../concert
   
   cupertino_icons: ^1.0.2
-  ffi: ^2.1.2
   path_provider: ^2.1.2
   path: ^1.9.0
   get: ^4.6.6
   adaptive_dialog: ^2.1.0
+  file_picker: ^8.0.3
+  uuid: ^4.4.0
+  permission_handler: ^11.3.1
+  device_info_plus: ^10.1.0
+  open_file_manager: ^1.0.2
+  flutter_easyloading: ^3.0.5
+  filesaverz: ^3.2.1
 
 dev_dependencies:
   flutter_test:

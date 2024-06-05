@@ -46,6 +46,8 @@ int Encrypt(const std::string &input_file_path,
             const std::string &password) {
   using namespace CryptoPP;
 
+  setlocale(LC_ALL, "zh_CN.utf8");
+
   try {
     if (!std::filesystem::exists(input_file_path)) {
       return CONCERT_AES_INPUT_FILE_NOT_EXISTS;
@@ -112,6 +114,11 @@ int Encrypt(const std::string &input_file_path,
       std::filesystem::rename(output_file_path, input_file_path);
     }
   } catch (const Exception &e) {
+    if (std::filesystem::exists(output_file_path)) {
+      std::filesystem::remove(output_file_path);
+    }
+
+    std::cerr << e.GetWhat() << std::endl;
     return e.GetErrorType();
   }
 
@@ -122,6 +129,14 @@ int Decrypt(const std::string &input_file_path,
             std::string output_file_path,
             const std::string &password) {
   using namespace CryptoPP;
+
+  setlocale(LC_ALL, "zh_CN.utf8");
+
+  std::ifstream ifs{input_file_path, std::ios::binary};
+  std::ofstream ofs{input_file_path, std::ios::binary | std::ios::app};
+
+  SecByteBlock iv(AES::BLOCKSIZE);
+  SecByteBlock key(AES::MAX_KEYLENGTH);
 
   try {
     if (!std::filesystem::exists(input_file_path)) {
@@ -145,8 +160,6 @@ int Decrypt(const std::string &input_file_path,
           std::filesystem::path(input_file_path).parent_path().string() + "/" + "tmp" + GenerateHex(16));
       use_temp_file = true;
     }
-    std::ifstream ifs{input_file_path, std::ios::binary};
-    std::ofstream ofs{input_file_path, std::ios::binary | std::ios::app};
 
     if (!ifs.is_open()) {
       return CONCERT_AES_CAN_NOT_OPEN_INPUT_FILE;
@@ -155,9 +168,6 @@ int Decrypt(const std::string &input_file_path,
     if (!ofs.is_open()) {
       return CONCERT_AES_CAN_NOT_OPEN_OUTPUT_FILE;
     }
-
-    SecByteBlock iv(AES::BLOCKSIZE);
-    SecByteBlock key(AES::MAX_KEYLENGTH);
 
     auto input_file_size = std::filesystem::file_size(input_file_path);
 
@@ -184,16 +194,16 @@ int Decrypt(const std::string &input_file_path,
     dec.SetKeyWithIV(key, key.size(), iv);
 
     // 解密文件
-    auto *file_sink = new FileSink{output_file_path.c_str(), true};
-    auto *file_source = new FileSource(input_file_path.c_str(),
-                                       true,
-                                       new StreamTransformationFilter(dec,
-                                                                      new Redirector(*file_sink),
-                                                                      StreamTransformationFilter::PKCS_PADDING));
+    {
+      auto *file_sink = new FileSink{output_file_path.c_str(), true};
+      new FileSource(input_file_path.c_str(),
+                     true,
+                     new StreamTransformationFilter(dec,
+                                                    new Redirector(*file_sink),
+                                                    StreamTransformationFilter::PKCS_PADDING));
+    }
 
     // 解除对文件的占用. 如果不解除对文件的占用, 则无法对文件进行写入
-    delete file_sink;
-    delete file_source;
 
     // 写入向量iv, 用于下一次解密
     ofs.write((const char *) (iv.BytePtr()), iv.size());
@@ -208,6 +218,11 @@ int Decrypt(const std::string &input_file_path,
       std::filesystem::rename(output_file_path, input_file_path);
     }
   } catch (const Exception &e) {
+    if (std::filesystem::exists(output_file_path)) {
+      std::filesystem::remove(output_file_path);
+    }
+    ofs.write((const char *) (iv.BytePtr()), iv.size());
+
     std::cerr << e.GetWhat() << std::endl;
     return e.GetErrorType();
   }

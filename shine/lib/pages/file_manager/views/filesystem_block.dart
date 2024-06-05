@@ -14,10 +14,12 @@ import 'package:shine/routes/app_pages.dart';
 import '../controllers/file_manager_controller.dart';
 
 class FileSystemBlock extends GetView<FileManagerController> {
-  const FileSystemBlock({super.key, required this.entity, required this.icon});
+  const FileSystemBlock(
+      {super.key, required this.entity, required this.icon, this.color});
 
   final FileSystemEntity entity;
   final Icon icon;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -27,19 +29,25 @@ class FileSystemBlock extends GetView<FileManagerController> {
       onLongPressStart: (details) {
         onLongPressStart(context, details);
       },
-      onTap: onTap,
       child: ListTile(
         title: Text(p.basename(entity.path)),
         subtitle: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text('Date: ${stat.modified.toString()}'),
+            Text(
+              'Date: ${stat.modified.toString()}',
+              style: const TextStyle(fontSize: 10),
+            ),
             const Text('\t'),
             stat.type != FileSystemEntityType.directory
-                ? Text('Size: ${(stat.size / 1024 / 1024).ceil()} MB')
+                ? Text(
+                    'Size: ${(stat.size / 1024 / 1024).ceil()} MB',
+                    style: const TextStyle(fontSize: 10),
+                  )
                 : const Text(''),
           ],
         ),
+        tileColor: color,
         leading: icon,
         onTap: onTap,
       ),
@@ -91,7 +99,7 @@ class FileSystemBlock extends GetView<FileManagerController> {
     if (results.isEmpty) return;
 
     try {
-      controller.rename(results.first, entity);
+      controller.rename(results.first.trim(), entity);
     } catch (e) {
       GeneralDialog.errorDialog(e.toString());
     }
@@ -101,14 +109,13 @@ class FileSystemBlock extends GetView<FileManagerController> {
 
   Future<void> delete(BuildContext context) async {
     try {
-      GeneralDialog.checkDialog(
+      await GeneralDialog.checkDialog(
         'Delete',
         'Are you sure you want to delete this file?',
         onConfirm: () {
           controller.delete(entity);
           controller.refresh();
         },
-        onCancel: () => Get.back(),
       );
     } catch (e) {
       GeneralDialog.errorDialog(e.toString());

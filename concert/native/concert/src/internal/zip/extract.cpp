@@ -10,6 +10,9 @@
 namespace concert::zip {
 int Extract(const std::string &archive_file, const std::string &output_dir, const std::string &password) {
   using namespace bit7z;
+
+  setlocale(LC_ALL, "zh_CN.utf8");
+
   try {
     if (!std::filesystem::exists(archive_file)) {
       return CONCERT_ZIP_ARCHIVE_FILE_NOT_EXISTS;

@@ -4,4 +4,5 @@ export 'file_manager/middlewares/file_manager_middleware.dart';
 export 'file_manager/bindings/file_manager_binding.dart';
 
 // home
-export 'home.dart';
+export 'home/views/home.dart';
+export 'home/bindings/home_binding.dart';

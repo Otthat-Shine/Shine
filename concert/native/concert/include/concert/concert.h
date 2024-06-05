@@ -1,8 +1,7 @@
 #ifndef CONCERT_INCLUDE_CONCERT_CONCERT_H_
 #define CONCERT_INCLUDE_CONCERT_CONCERT_H_
 
-#include "export_aes.h"
+#include "export_chacha20_poly1305.h"
 #include "export_zip.h"
-#include "export_utils.h"
 
 #endif //CONCERT_INCLUDE_CONCERT_CONCERT_H_

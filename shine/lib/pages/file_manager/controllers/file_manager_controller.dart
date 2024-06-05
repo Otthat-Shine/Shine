@@ -46,7 +46,8 @@ extension on List<FileSystemEntity> {
 }
 
 class FileManagerController extends GetxController {
-  String? _rootPath;
+  bool enableConcert = false;
+
   String? _previousPath;
   String? _currentPath;
 
@@ -107,7 +108,7 @@ class FileManagerController extends GetxController {
       sort();
 
       _entities.value = _dirEntities + _fileEntities;
-    } catch (e) {}
+    } finally {}
   }
 
   void sort() {

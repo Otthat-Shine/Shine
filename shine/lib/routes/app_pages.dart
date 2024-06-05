@@ -14,13 +14,15 @@ class AppPages {
       GetPage(
         name: AppRoutes.home,
         page: () => const Home(),
+        binding: HomeBinding(),
       ),
       GetPage(
-          name: AppRoutes.fileManager,
-          page: () => const FileManager(),
-          binding: FileManagerBinding(),
-          preventDuplicates: false,
-          middlewares: [FileManagerMiddleware()]),
+        name: AppRoutes.fileManager,
+        page: () => const FileManager(),
+        binding: FileManagerBinding(),
+        preventDuplicates: false,
+        middlewares: [FileManagerMiddleware()],
+      ),
     ];
   }
 }

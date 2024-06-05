@@ -6,8 +6,8 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:get/get.dart';
 
 class GeneralDialog {
-  static void warningDialog(String content) {
-    Get.defaultDialog(
+  static Future<void> warningDialog(String content) async {
+    await Get.defaultDialog(
       title: 'Warning',
       content: Text(content),
       confirm: ElevatedButton(
@@ -17,8 +17,8 @@ class GeneralDialog {
     );
   }
 
-  static void errorDialog(String content) {
-    Get.defaultDialog(
+  static Future<void> errorDialog(String content) async {
+    await Get.defaultDialog(
       title: 'Error',
       content: Text(content),
       confirm: ElevatedButton(
@@ -28,26 +28,27 @@ class GeneralDialog {
     );
   }
 
-  static void checkDialog(
+  static Future<void> checkDialog(
     String title,
     String content, {
     void Function()? onConfirm,
     void Function()? onCancel,
-  }) {
-    Get.defaultDialog(
+  }) async {
+    await Get.defaultDialog(
       title: title,
       content: Text(content),
       confirm: ElevatedButton(
         onPressed: () {
-          if (onConfirm != null) {
-            onConfirm();
-          }
+          if (onConfirm != null) onConfirm();
           Get.back();
         },
         child: const Text('OK'),
       ),
       cancel: ElevatedButton(
-        onPressed: () => Get.back(),
+        onPressed: () {
+          if (onCancel != null) onCancel();
+          Get.back();
+        },
         child: const Text('Cancel'),
       ),
     );
@@ -57,10 +58,14 @@ class GeneralDialog {
     BuildContext context, {
     required String title,
     required String hintText,
+    bool? obscureText,
   }) async {
     List<String> results = await showTextInputDialog(
           context: context,
-          textFields: [DialogTextField(hintText: hintText)],
+          textFields: [
+            DialogTextField(
+                hintText: hintText, obscureText: obscureText ?? false)
+          ],
           title: title,
           autoSubmit: true,
         ) ??
