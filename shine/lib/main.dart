@@ -16,6 +16,10 @@ void main(List<String> args) {
     debugShowCheckedModeBanner: false,
     getPages: AppPages.routes,
     builder: EasyLoading.init(),
+    theme: ThemeData(
+      fontFamily: 'HarmonyOS Sans',
+      useMaterial3: true,
+    ),
   ));
 }
 
