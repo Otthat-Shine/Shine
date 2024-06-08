@@ -68,6 +68,8 @@ class FileSystemBlock extends GetView<FileManagerController> {
           arguments: {'path': entity.path},
         );
         break;
+      case FileSystemEntityType.file:
+        openFile();
       default:
     }
   }
@@ -90,6 +92,16 @@ class FileSystemBlock extends GetView<FileManagerController> {
       PopupMenuItem(child: const Text('Rename'), onTap: () => rename(context)),
       PopupMenuItem(child: const Text('Delete'), onTap: () => delete(context)),
     ];
+  }
+
+  void openFile() {
+    if (entity.path.isVideoFileName) {
+      playVideo(entity.path);
+    }
+  }
+
+  void playVideo(String path) {
+    Get.toNamed(AppRoutes.videoPlayer, parameters: {'path': path});
   }
 
   Future<void> rename(BuildContext context) async {
