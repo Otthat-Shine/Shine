@@ -50,6 +50,8 @@ dev_dependencies:
 
   flutter_lints: ^2.0.0
   import_sorter: ^4.6.0
+  pubspec_generator: ^4.0.0
+  build_runner: ^2.4.11
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -59,3 +61,8 @@ flutter:
     - family: HarmonyOS Sans
       fonts:
         - asset: fonts/HarmonyOS_Sans_SC_Regular.ttf
+  assets:
+    - assets/images/
+    - assets/images/2.0x/
+    - assets/images/3.0x/
+

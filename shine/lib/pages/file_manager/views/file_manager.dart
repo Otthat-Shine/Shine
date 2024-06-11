@@ -28,7 +28,7 @@ class FileManager extends GetView<FileManagerController> {
         actions: [
           Offstage(
               offstage: !controller.enableConcert, child: SaveAsConcertFile()),
-          const OtherOptions(),
+          const _OtherOptions(),
         ],
       ),
       body: Obx(
@@ -129,8 +129,8 @@ class FileManager extends GetView<FileManagerController> {
   }
 }
 
-class OtherOptions extends GetView<FileManagerController> {
-  const OtherOptions({super.key});
+class _OtherOptions extends GetView<FileManagerController> {
+  const _OtherOptions({super.key});
 
   @override
   Widget build(BuildContext context) {

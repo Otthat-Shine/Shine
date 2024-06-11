@@ -9,6 +9,8 @@ import 'package:path/path.dart' as p;
 // Project imports:
 import 'package:shine/common/file_picker_wrapper.dart';
 import 'package:shine/common/general_dialog.dart';
+import 'package:shine/generated/assets.dart';
+import 'package:shine/generated/pubspec.dart';
 import 'package:shine/routes/app_pages.dart';
 import '../controllers/home_controller.dart';
 
@@ -20,6 +22,9 @@ class Home extends GetView<HomeController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shine'),
+        actions: const [
+          _OtherOptions(),
+        ],
       ),
       body: Center(
         child: Column(
@@ -127,6 +132,61 @@ class Home extends GetView<HomeController> {
       AppRoutes.fileManager,
       preventDuplicates: false,
       arguments: {'enableConcert': true, 'path': selectedPath},
+    );
+  }
+}
+
+class _OtherOptions extends StatelessWidget {
+  const _OtherOptions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+      itemBuilder: (context) => options(context),
+      icon: const Icon(Icons.dehaze),
+    );
+  }
+
+  List<PopupMenuEntry> options(BuildContext context) {
+    return [
+      PopupMenuItem(
+        child: const Text('About'),
+        onTap: () {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return const About();
+              });
+        },
+      ),
+    ];
+  }
+}
+
+class About extends StatelessWidget {
+  const About({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AboutDialog(
+      applicationName: 'Shine',
+      applicationVersion: 'version: ${Pubspec.version.canonical}',
+      applicationIcon: Image.asset(Assets.appIcon, width: 60),
+      children: const [
+        SelectableText.rich(
+          TextSpan(
+            children: [
+              TextSpan(text: '''
+「阳光」 之下无君子
+「谐乐」 之上无圣贤
+在你打开之时，你已然踏上一条不归之路，这里没有互通立交，有的只是通向平行之路的一条匝道。
+'''),
+              TextSpan(text: '务必三思而后行。', style: TextStyle(color: Colors.red)),
+            ],
+          ),
+          style: TextStyle(fontSize: 16),
+        ),
+      ],
     );
   }
 }
