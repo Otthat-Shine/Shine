@@ -7,12 +7,12 @@ import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
 // Project imports:
-import 'package:shine/common/file_picker_wrapper.dart';
 import 'package:shine/common/general_dialog.dart';
 import 'package:shine/generated/assets.dart';
 import 'package:shine/generated/pubspec.dart';
 import 'package:shine/routes/app_pages.dart';
 import '../controllers/home_controller.dart';
+import 'concert_form.dart';
 
 class Home extends GetView<HomeController> {
   const Home({super.key});
@@ -31,7 +31,7 @@ class Home extends GetView<HomeController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () async => await createConcertFile(context),
+              onPressed: () async => await _createConcertFile(context),
               child: const Text('Create Concert File'),
             ),
             const SizedBox(height: 20),
@@ -45,42 +45,20 @@ class Home extends GetView<HomeController> {
     );
   }
 
-  Future<void> createConcertFile(BuildContext context) async {
-    if (!context.mounted) return;
-    List<String> name = await GeneralDialog.openTextInputDialog(
-      context,
-      title: 'What would you like to name the concert file?',
-      hintText: 'name...',
-    );
-    if (name.isEmpty) return;
+  Future<void> _createConcertFile(BuildContext context) async {
+    CreateConcertForm concertForm = CreateConcertForm();
+    await concertForm.show(context);
 
-    if (!context.mounted) return;
-    List<String> password = await GeneralDialog.openTextInputDialog(
-      context,
-      title: 'Please enter the password',
-      hintText: 'password...',
-      obscureText: true,
-    );
-    if (password.isEmpty) return;
-
-    if (!context.mounted) return;
-    List<String>? selectedFiles = await FilePickerWrapper.pickFiles(
-      context: context,
-      title: 'Select the files to make concert file',
-    );
-    if (selectedFiles == null) return;
-
-    if (!context.mounted) return;
-    String? selectedPath = await FilePickerWrapper.getDirectoryPath(
-      title: 'Select a location to save the concert file',
-    );
-    if (selectedPath == null) return;
+    if (!concertForm.validate()) return;
 
     EasyLoading.show(status: 'Creating...');
 
     try {
-      await controller.createConcertFile(selectedFiles,
-          p.join(selectedPath, '${name.first}.concert'), password.first);
+      await controller.createConcertFile(
+        concertForm.files,
+        p.join(concertForm.dest, '${concertForm.name}.concert'),
+        concertForm.password,
+      );
 
       EasyLoading.dismiss();
       EasyLoading.showSuccess('Create successfully');
@@ -92,33 +70,19 @@ class Home extends GetView<HomeController> {
   }
 
   Future<void> extractConcertFile(BuildContext context) async {
-    String? selectedFile = await FilePickerWrapper.pickSignalFile(
-      context: context,
-      title: 'Please select a concert file',
-      allowedExtensions: ['.concert'],
-    );
-    if (selectedFile == null) return;
+    ExtractConcertForm concertForm = ExtractConcertForm();
+    await concertForm.show(context);
 
-    if (!context.mounted) return;
-    List<String> password = await GeneralDialog.openTextInputDialog(
-      context,
-      title: 'Please enter the password',
-      hintText: 'password...',
-      obscureText: true,
-    );
-    if (password.isEmpty) return;
-
-    if (!context.mounted) return;
-    String? selectedPath = await FilePickerWrapper.getDirectoryPath(
-      title: 'Select a location to save the concert file',
-    );
-    if (selectedPath == null) return;
+    if (!concertForm.validate()) return;
 
     EasyLoading.show(status: 'Extracting...');
 
     try {
       await controller.extractConcertFile(
-          selectedFile, selectedPath, password.first);
+        concertForm.concertFile,
+        concertForm.dest,
+        concertForm.password,
+      );
 
       EasyLoading.dismiss();
       EasyLoading.showSuccess('Extract successfully');
@@ -131,7 +95,7 @@ class Home extends GetView<HomeController> {
     Get.toNamed(
       AppRoutes.fileManager,
       preventDuplicates: false,
-      arguments: {'enableConcert': true, 'path': selectedPath},
+      arguments: {'enableConcert': true, 'path': concertForm.dest},
     );
   }
 }
@@ -153,18 +117,19 @@ class _OtherOptions extends StatelessWidget {
         child: const Text('About'),
         onTap: () {
           showDialog(
-              context: context,
-              builder: (context) {
-                return const About();
-              });
+            context: context,
+            builder: (context) {
+              return const _About();
+            },
+          );
         },
       ),
     ];
   }
 }
 
-class About extends StatelessWidget {
-  const About({super.key});
+class _About extends StatelessWidget {
+  const _About({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -39,7 +39,7 @@ class VideoPlayerController extends GetxController {
 
   @override
   void onClose() {
-    _videoPlayerController!.pause();
+    _videoPlayerController!.dispose();
     super.onClose();
   }
 }

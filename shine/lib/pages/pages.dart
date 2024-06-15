@@ -6,3 +6,7 @@ export 'file_manager/bindings/file_manager_binding.dart';
 // home
 export 'home/views/home.dart';
 export 'home/bindings/home_binding.dart';
+
+// video_player
+export 'video_player/views/video_player.dart';
+export 'video_player/bindings/video_player_binding.dart';

@@ -40,15 +40,7 @@ class Concert {
     if (dest.isEmpty) return false;
     if (password.isEmpty) return false;
 
-    String fileList = '';
-
-    for (var i = 0; i < files.length; i++) {
-      if (i == files.length - 1) {
-        fileList += files[i];
-        break;
-      }
-      fileList += '${files[i]}?';
-    }
+    String fileList = files.join('?');
 
     final tempFile = p.join(p.dirname(dest), const Uuid().v4());
 

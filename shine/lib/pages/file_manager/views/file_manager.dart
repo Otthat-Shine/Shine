@@ -8,10 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:open_file_manager/open_file_manager.dart' as open_file_manager;
-import 'package:path/path.dart' as p;
 
 // Project imports:
-import 'package:shine/common/file_picker_wrapper.dart';
 import 'package:shine/common/general_dialog.dart';
 import 'package:shine/pages/home/controllers/home_controller.dart';
 import '../controllers/file_manager_controller.dart';
@@ -186,8 +184,8 @@ class _OtherOptions extends GetView<FileManagerController> {
 class SaveAsConcertFile extends StatelessWidget {
   SaveAsConcertFile({super.key});
 
-  var fileManagerController = Get.find<FileManagerController>();
-  var homeController = Get.find<HomeController>();
+  final fileManagerController = Get.find<FileManagerController>();
+  final homeController = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -224,55 +222,25 @@ class SaveAsConcertFile extends StatelessWidget {
       return;
     }
 
-    if (Platform.isAndroid) {
-      if (!context.mounted) return;
-      List<String> name = await GeneralDialog.openTextInputDialog(
-        context,
-        title: 'What would you like to name the concert file?',
-        hintText: 'name...',
-      );
-      if (name.isEmpty) return;
-
-      if (!context.mounted) return;
-      List<String> newPassword = await GeneralDialog.openTextInputDialog(
-        context,
-        title: 'Please enter the password',
-        hintText: 'password...',
-        obscureText: true,
-      );
-      if (newPassword.isEmpty) return;
-
-      if (!context.mounted) return;
-      String? savePath = await FilePickerWrapper.getDirectoryPath(
-          title: 'Select a location to save the concert file');
-      if (savePath == null) return;
-
-      password = newPassword.first;
-      dest = p.join(savePath, '${name.first}.concert');
-    } else {
-      if (!File(homeController.concertFilePath).existsSync()) {
-        await GeneralDialog.errorDialog(
-            '${homeController.concertFilePath} does not exist');
-        return;
-      }
-
-      if (!context.mounted) return;
-      List<String> newPassword = await GeneralDialog.openTextInputDialog(
-        context,
-        title: 'Please enter the password',
-        hintText: 'password...',
-        obscureText: true,
-      );
-      if (newPassword.isEmpty) return;
-
-      password = newPassword.first;
-      dest = homeController.concertFilePath;
+    if (!File(homeController.concertFilePath).existsSync()) {
+      await GeneralDialog.errorDialog(
+          '${homeController.concertFilePath} does not exist');
+      return;
     }
 
-    List<String> files = [];
-    for (var e in fileEntityList) {
-      files.add(e.path);
-    }
+    if (!context.mounted) return;
+    List<String> newPassword = await GeneralDialog.openTextInputDialog(
+      context,
+      title: 'Please enter the password',
+      hintText: 'password...',
+      obscureText: true,
+    );
+    if (newPassword.isEmpty) return;
+
+    password = newPassword.first;
+    dest = homeController.concertFilePath;
+
+    List<String> files = fileEntityList.map((v) => v.path).toList();
 
     try {
       EasyLoading.show(status: 'Creating...');
