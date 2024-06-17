@@ -99,5 +99,6 @@ include(GoogleTest)
 gtest_discover_tests(${TEST_RUNNER})
 endif()
 
+set(TARGET_PLATFORM "windows" CACHE STRING "TARGET_PLATFORM")
 set(CONCERT_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../../concert/native/concert")
 add_subdirectory("${CONCERT_SOURCE_DIR}" concert)

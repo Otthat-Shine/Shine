@@ -1,107 +1,46 @@
-import 'dart:io';
+// Dart imports:
+import 'dart:async';
 
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
 
-import 'package:concert/concert.dart';
+// Package imports:
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 
-void main() async {
-  runApp(const MyApp());
-}
+// Project imports:
+import 'package:shine/common/general_dialog.dart';
+import 'package:shine/routes/app_pages.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+void main(List<String> args) {
+  init();
 
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+  runZonedGuarded(() {
+    runApp(GetMaterialApp(
+      initialRoute: AppPages.initial,
+      debugShowCheckedModeBanner: false,
+      getPages: AppPages.routes,
+      builder: EasyLoading.init(),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: 'HarmonyOS Sans',
         useMaterial3: true,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text("Aes Encrypt/Decrypt Test"),
-        ),
-        body: AesTest(),
-      ),
-    );
-  }
+    ));
+  }, (e, s) {
+    GeneralDialog.errorDialog(e.toString());
+  });
 }
 
-class AesTest extends StatefulWidget {
-  const AesTest({super.key});
-
-  @override
-  State<AesTest> createState() => _AesTestState();
-}
-
-class _AesTestState extends State<AesTest> {
-  String plainText = "";
-  String decryptCipherText = "";
-
-  void _testAes() async {
-    String currentPath;
-    if (Platform.isWindows) {
-      currentPath = dirname(Platform.resolvedExecutable);
-    } else if (Platform.isAndroid) {
-      currentPath = (await getApplicationDocumentsDirectory()).path;
-    } else {
-      throw "Unsupported Platform";
-    }
-
-    const plainText = 'Hello, World from Flutter';
-    final testFile = File('$currentPath/test_aes.txt')
-      ..createSync()
-      ..writeAsStringSync(plainText);
-
-    Concert concert = Concert();
-    concert.func.AesEncrypt(
-      '$currentPath/test_aes.txt'.toCStr(),
-      '$currentPath/test_aes_cipher.txt'.toCStr(),
-      '12345678'.toCStr(),
-    );
-    concert.func.AesDecrypt(
-      '$currentPath/test_aes_cipher.txt'.toCStr(),
-      '$currentPath/test_aes_decrypt_cipher.txt'.toCStr(),
-      '12345678'.toCStr(),
-    );
-
-    setState(() {
-      this.plainText = plainText;
-      this.decryptCipherText =
-          File('$currentPath/test_aes_decrypt_cipher.txt').readAsStringSync();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Press button to test",
-          style: TextStyle(fontSize: 40),
-        ),
-        ElevatedButton(
-          onPressed: _testAes,
-          style: ButtonStyle(
-            fixedSize: MaterialStateProperty.all(const Size(100, 100)),
-          ),
-          child: const Icon(Icons.check, size: 50,),
-        ),
-        Text(
-          "Plain:\n$plainText",
-          style: const TextStyle(fontSize: 30),
-        ),
-        Text(
-          'Decrypt Cipher Text:\n$decryptCipherText',
-          style: const TextStyle(fontSize: 30),
-        ),
-      ],
-    );
-  }
+void init() {
+  // Flutter Easy Loading
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 2000)
+    ..indicatorType = EasyLoadingIndicatorType.cubeGrid
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..maskColor = Colors.blue.withOpacity(0.5)
+    ..userInteractions = true
+    ..dismissOnTap = false;
 }

@@ -25,53 +25,165 @@ class GenConcert {
 
   set concert(int value) => _concert.value = value;
 
-  int AesEncrypt(
-    ffi.Pointer<ffi.Char> input_file_path,
-    ffi.Pointer<ffi.Char> output_file_path,
+  int ChaCha20Poly1305EncryptFile(
+    ffi.Pointer<ffi.Char> source_file,
+    ffi.Pointer<ffi.Char> target_file,
     ffi.Pointer<ffi.Char> password,
   ) {
-    return _AesEncrypt(
-      input_file_path,
-      output_file_path,
+    return _ChaCha20Poly1305EncryptFile(
+      source_file,
+      target_file,
       password,
     );
   }
 
-  late final _AesEncryptPtr = _lookup<
+  late final _ChaCha20Poly1305EncryptFilePtr = _lookup<
       ffi.NativeFunction<
           ffi.Int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>)>>('AesEncrypt');
-  late final _AesEncrypt = _AesEncryptPtr.asFunction<
-      int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('ChaCha20Poly1305EncryptFile');
+  late final _ChaCha20Poly1305EncryptFile =
+      _ChaCha20Poly1305EncryptFilePtr.asFunction<
+          int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>();
+
+  int ChaCha20Poly1305DecryptFile(
+    ffi.Pointer<ffi.Char> source_file,
+    ffi.Pointer<ffi.Char> target_file,
+    ffi.Pointer<ffi.Char> password,
+  ) {
+    return _ChaCha20Poly1305DecryptFile(
+      source_file,
+      target_file,
+      password,
+    );
+  }
+
+  late final _ChaCha20Poly1305DecryptFilePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('ChaCha20Poly1305DecryptFile');
+  late final _ChaCha20Poly1305DecryptFile =
+      _ChaCha20Poly1305DecryptFilePtr.asFunction<
+          int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>();
+
+  int ZipCompress(
+    ffi.Pointer<ffi.Char> list_of_file,
+    ffi.Pointer<ffi.Char> output_path,
+    int compression_method,
+    int compression_level,
+    ffi.Pointer<ffi.Char> password,
+  ) {
+    return _ZipCompress(
+      list_of_file,
+      output_path,
+      compression_method,
+      compression_level,
+      password,
+    );
+  }
+
+  late final _ZipCompressPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
+              ffi.Int, ffi.Int, ffi.Pointer<ffi.Char>)>>('ZipCompress');
+  late final _ZipCompress = _ZipCompressPtr.asFunction<
+      int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, int, int,
           ffi.Pointer<ffi.Char>)>();
 
-  int AesDecrypt(
-    ffi.Pointer<ffi.Char> input_file_path,
-    ffi.Pointer<ffi.Char> output_file_path,
+  int ZipCompressDirectory(
+    ffi.Pointer<ffi.Char> dir_path,
+    ffi.Pointer<ffi.Char> output_path,
+    int compression_method,
+    int compression_level,
     ffi.Pointer<ffi.Char> password,
   ) {
-    return _AesDecrypt(
-      input_file_path,
-      output_file_path,
+    return _ZipCompressDirectory(
+      dir_path,
+      output_path,
+      compression_method,
+      compression_level,
       password,
     );
   }
 
-  late final _AesDecryptPtr = _lookup<
+  late final _ZipCompressDirectoryPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Int,
+              ffi.Int,
+              ffi.Pointer<ffi.Char>)>>('ZipCompressDirectory');
+  late final _ZipCompressDirectory = _ZipCompressDirectoryPtr.asFunction<
+      int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, int, int,
+          ffi.Pointer<ffi.Char>)>();
+
+  int ZipExtract(
+    ffi.Pointer<ffi.Char> archive_file,
+    ffi.Pointer<ffi.Char> output_dir,
+    ffi.Pointer<ffi.Char> password,
+  ) {
+    return _ZipExtract(
+      archive_file,
+      output_dir,
+      password,
+    );
+  }
+
+  late final _ZipExtractPtr = _lookup<
       ffi.NativeFunction<
           ffi.Int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>)>>('AesDecrypt');
-  late final _AesDecrypt = _AesDecryptPtr.asFunction<
+              ffi.Pointer<ffi.Char>)>>('ZipExtract');
+  late final _ZipExtract = _ZipExtractPtr.asFunction<
       int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>)>();
 }
 
-const int CONCERT_AES_INPUT_FILE_NOT_EXISTS = -1;
+const int CONCERT_CHACHA20_POLY1305_ENCRYPT_FAILED = -2;
 
-const int CONCERT_AES_CAN_NOT_OPEN_OUTPUT_FILE = -2;
+const int CONCERT_CHACHA20_POLY1305_DECRYPT_FAILED = -3;
 
-const int CONCERT_AES_CAN_NOT_OPEN_INPUT_FILE = -3;
+const int CONCERT_CHACHA20_POLY1305_CAN_NOT_OPEN_SOURCE_FILE = -4;
 
-const int CONCERT_AES_INPUT_FILE_LESS_THAN_32BYTES = -4;
+const int CONCERT_CHACHA20_POLY1305_CAN_NOT_OPEN_TARGET_FILE = -5;
 
-const int CONCERT_AES_EMPTY_PASSWORD = -5;
+const int CONCERT_CHACHA20_POLY1305_NOT_CONCERT_FILE = -6;
+
+const int BitCompressionMethodCopy = 0;
+
+const int BitCompressionMethodDeflate = 1;
+
+const int BitCompressionMethodDeflate64 = 2;
+
+const int BitCompressionMethodBZip2 = 3;
+
+const int BitCompressionMethodLzma = 4;
+
+const int BitCompressionMethodLzma2 = 5;
+
+const int BitCompressionMethodPpmd = 6;
+
+const int BitCompressionLevelNone = 0;
+
+const int BitCompressionLevelFastest = 1;
+
+const int BitCompressionLevelFast = 3;
+
+const int BitCompressionLevelNormal = 5;
+
+const int BitCompressionLevelMax = 7;
+
+const int BitCompressionLevelUltra = 9;
+
+const int CONCERT_ZIP_EMPTY_FILE_LIST = -1;
+
+const int CONCERT_ZIP_EMPTY_OUTPUT_PATH = -2;
+
+const int CONCERT_ZIP_INVALID_DIR_PATH = -3;
+
+const int CONCERT_ZIP_INVALID_COMPRESSION_METHOD = -4;
+
+const int CONCERT_ZIP_INVALID_COMPRESSION_LEVEL = -5;
+
+const int CONCERT_ZIP_ARCHIVE_FILE_NOT_EXISTS = -6;

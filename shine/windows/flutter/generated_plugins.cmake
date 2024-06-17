@@ -4,6 +4,10 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   concert
+  dynamic_color
+  fullscreen_window
+  permission_handler_windows
+  video_player_win
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

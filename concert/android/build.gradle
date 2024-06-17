@@ -67,6 +67,12 @@ android {
     }
 
     defaultConfig {
+        externalNativeBuild {
+            cmake {
+                arguments '-DTARGET_PLATFORM=android'
+            }
+        }
+
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
         }
