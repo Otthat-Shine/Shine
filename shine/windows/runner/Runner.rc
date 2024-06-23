@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "art.execve" "\0"
-            VALUE "FileDescription", "shine" "\0"
+            VALUE "CompanyName", "Otthat" "\0"
+            VALUE "FileDescription", "Shine" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "shine" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 art.execve. All rights reserved." "\0"
-            VALUE "OriginalFilename", "shine.exe" "\0"
-            VALUE "ProductName", "shine" "\0"
+            VALUE "InternalName", "Shine" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 Otthat. All rights reserved." "\0"
+            VALUE "OriginalFilename", "Shine.exe" "\0"
+            VALUE "ProductName", "Shine" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
