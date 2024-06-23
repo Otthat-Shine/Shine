@@ -1,4 +1,4 @@
-package art.execve.shine
+package cn.otthat.shine
 
 import io.flutter.embedding.android.FlutterActivity
 
