@@ -3,12 +3,12 @@ import 'dart:io';
 import 'dart:isolate';
 
 // Package imports:
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 // Project imports:
 import 'package:shine/common/concert.dart';
+import 'package:shine/common/device_info.dart';
 import '../../../common/general_dialog.dart';
 
 class HomeController extends GetxController {
@@ -66,11 +66,7 @@ class HomeController extends GetxController {
   }
 
   Future<List<Permission>> checkPermissions() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-
-    int sdkVersion = (await deviceInfo.androidInfo).version.sdkInt;
-
-    if (sdkVersion >= 29) {
+    if (AndroidDeviceInfo.sdkVersion >= 29) {
       _permissions.addAll([Permission.manageExternalStorage]);
     }
 
