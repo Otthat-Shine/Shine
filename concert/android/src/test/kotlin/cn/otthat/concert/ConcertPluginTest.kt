@@ -1,4 +1,4 @@
-package art.execve.concert
+package cn.otthat.concert
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
