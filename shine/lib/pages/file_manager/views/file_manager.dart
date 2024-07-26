@@ -197,6 +197,9 @@ class SaveAsConcertFile extends StatelessWidget {
   }
 
   Future<void> onPressed(BuildContext context) async {
+    final concertFile = fileManagerController.concertFile!;
+    final concertExtDir = fileManagerController.concertExtDir!;
+
     bool isOK = false;
     await Dialogs.check(
       'Save',
@@ -206,24 +209,18 @@ class SaveAsConcertFile extends StatelessWidget {
     );
     if (!isOK) return;
 
-    String dest = '';
-    String password = '';
-
-    final extractionPath = Directory(homeController.extractionPath);
-    final fileEntityList = extractionPath.listSync();
-
-    if (!extractionPath.existsSync()) {
-      Dialogs.error('${extractionPath.path} does not exist');
+    if (!concertFile.existsSync()) {
+      await Dialogs.error('${concertFile.path} does not exist');
+      return;
+    }
+    if (!concertExtDir.existsSync()) {
+      Dialogs.error('${concertExtDir.path} does not exist');
       return;
     }
 
-    if (fileEntityList.isEmpty) {
+    final files = concertExtDir.listSync();
+    if (files.isEmpty) {
       Dialogs.error('Directory is empty');
-      return;
-    }
-
-    if (!File(homeController.concertFilePath).existsSync()) {
-      await Dialogs.error('${homeController.concertFilePath} does not exist');
       return;
     }
 
@@ -236,14 +233,11 @@ class SaveAsConcertFile extends StatelessWidget {
     );
     if (newPassword.isEmpty) return;
 
-    password = newPassword.first;
-    dest = homeController.concertFilePath;
-
-    List<String> files = fileEntityList.map((v) => v.path).toList();
+    String password = newPassword.first;
 
     try {
       EasyLoading.show(status: 'Creating...');
-      await homeController.createConcertFile(files, dest, password);
+      await homeController.createConcertFile(files, concertFile, password);
       EasyLoading.dismiss();
       EasyLoading.showSuccess('Write successfully');
     } catch (e) {

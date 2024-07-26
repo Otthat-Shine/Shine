@@ -47,6 +47,8 @@ extension on List<FileSystemEntity> {
 
 class FileManagerController extends GetxController {
   bool enableConcert = false;
+  File? concertFile;
+  Directory? concertExtDir;
 
   String? _previousPath;
   String? _currentPath;

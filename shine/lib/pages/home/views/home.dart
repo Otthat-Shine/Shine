@@ -1,3 +1,6 @@
+// Dart imports:
+import 'dart:io';
+
 // Flutter imports:
 import 'package:flutter/material.dart';
 
@@ -55,9 +58,9 @@ class Home extends GetView<HomeController> {
 
     try {
       await controller.createConcertFile(
-        concertForm.files,
-        p.join(concertForm.dest, '${concertForm.name}.concert'),
-        concertForm.password,
+        concertForm.files!,
+        concertForm.dest!,
+        concertForm.password!,
       );
 
       EasyLoading.dismiss();
@@ -79,9 +82,9 @@ class Home extends GetView<HomeController> {
 
     try {
       await controller.extractConcertFile(
-        concertForm.concertFile,
-        concertForm.dest,
-        concertForm.password,
+        concertForm.concertFile!,
+        concertForm.dest!,
+        concertForm.password!,
       );
 
       EasyLoading.dismiss();
@@ -95,7 +98,12 @@ class Home extends GetView<HomeController> {
     Get.toNamed(
       AppRoutes.fileManager,
       preventDuplicates: false,
-      arguments: {'enableConcert': true, 'path': concertForm.dest},
+      arguments: {
+        'enableConcert': true,
+        'path': concertForm.dest!.path,
+        'concertFile': concertForm.concertFile,
+        'concertExtDir': concertForm.dest,
+      },
     );
   }
 }

@@ -1,12 +1,16 @@
+// Dart imports:
+import 'dart:io';
+
 // Flutter imports:
 import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:get/get.dart';
+import 'package:path/path.dart' as p;
 
 // Project imports:
 import 'package:shine/common/dialogs.dart';
-import 'package:shine/common/file_picker_wrapper.dart';
+import 'package:shine/common/file_picker.dart';
 import 'package:shine/widgets/forms.dart';
 
 class CreateConcertForm {
@@ -14,18 +18,21 @@ class CreateConcertForm {
   final TextEditingController txFiles = TextEditingController();
   final TextEditingController txDest = TextEditingController();
 
-  String _name = '';
-  String _password = '';
-  List<String> _files = [];
-  String _dest = '';
+  String? _name;
+  String? _password;
+  List<File>? _files;
+  Directory? _dest;
 
-  get name => _name;
+  String? get name => _name;
 
-  get password => _password;
+  String? get password => _password;
 
-  get files => _files;
+  List<File>? get files => _files;
 
-  get dest => _dest;
+  // 方便后续调用, 将目的地和名称拼接在一起
+  File? get dest {
+    return File(p.join(_dest!.path, "${_name!}.concert"));
+  }
 
   Future<void> show(BuildContext context) async {
     await showDialog(
@@ -69,18 +76,18 @@ class CreateConcertForm {
                   autovalidateMode: AutovalidateMode.always,
                   obscureText: true,
                 ),
-                TextWithButtonFormField<List<String>>(
+                TextWithButtonFormField<List<File>>(
                   buttonText: 'Choose',
                   decoration: const InputDecoration(
                       hintText: 'files', labelText: 'Files'),
                   onPressed: (state) async {
-                    List<String>? selectedFiles =
-                        await FilePickerWrapper.pickFiles(
+                    List<File>? selectedFiles = await FilePicker.pickFiles(
                       context: context,
                       title: 'Select the files to make concert file',
                     );
                     if (selectedFiles == null) return;
-                    txFiles.text = selectedFiles.join(';');
+                    txFiles.text =
+                        selectedFiles.map((e) => e.path).toList().join(';');
                     state.didChange(selectedFiles);
                   },
                   onSaved: (v) => _files = v!,
@@ -90,22 +97,21 @@ class CreateConcertForm {
                   autovalidateMode: AutovalidateMode.always,
                   readOnly: true,
                 ),
-                TextWithButtonFormField<String>(
+                TextWithButtonFormField<Directory>(
                   buttonText: 'Choose',
                   decoration: const InputDecoration(
                       hintText: 'destination', labelText: 'Destination'),
                   onPressed: (state) async {
                     if (!context.mounted) return;
-                    String? selectedPath =
-                        await FilePickerWrapper.getDirectoryPath(
+                    Directory? selectedPath = await FilePicker.getDirectoryPath(
                       title: 'Select a location to save the concert file',
                     );
                     if (selectedPath == null) return;
-                    txDest.text = selectedPath;
+                    txDest.text = selectedPath.path;
                     state.didChange(selectedPath);
                   },
                   onSaved: (v) => _dest = v!,
-                  validator: (v) => (v == null || v.isEmpty)
+                  validator: (v) => (v == null || !v.existsSync())
                       ? 'Please select a location'
                       : null,
                   txController: txDest,
@@ -150,15 +156,15 @@ class ExtractConcertForm {
   final TextEditingController txConcertFile = TextEditingController();
   final TextEditingController txDest = TextEditingController();
 
-  String _concertFile = '';
-  String _password = '';
-  String _dest = '';
+  File? _concertFile;
+  String? _password = '';
+  Directory? _dest;
 
-  get concertFile => _concertFile;
+  File? get concertFile => _concertFile;
 
-  get password => _password;
+  String? get password => _password;
 
-  get dest => _dest;
+  Directory? get dest => _dest;
 
   Future<void> show(BuildContext context) async {
     await showDialog(
@@ -184,23 +190,23 @@ class ExtractConcertForm {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextWithButtonFormField<String>(
+                TextWithButtonFormField<File>(
                   buttonText: 'Choose',
                   decoration: const InputDecoration(
                       hintText: 'concert file', labelText: 'Concert File'),
                   onPressed: (state) async {
-                    String? selectedFile =
-                        await FilePickerWrapper.pickSignalFile(
+                    File? selectedFile = await FilePicker.pickSignalFile(
                       context: context,
                       title: 'Please select a concert file',
+                      allowedExtensions: ['.concert'],
                     );
                     if (selectedFile == null) return;
-                    txConcertFile.text = selectedFile;
+                    txConcertFile.text = selectedFile.path;
                     state.didChange(selectedFile);
                   },
                   onSaved: (v) => _concertFile = v!,
-                  validator: (v) => (v == null || v.isEmpty)
-                      ? 'Please select a concert file'
+                  validator: (v) => (v == null || !v.existsSync())
+                      ? 'Please select a location'
                       : null,
                   txController: txConcertFile,
                   autovalidateMode: AutovalidateMode.always,
@@ -216,22 +222,21 @@ class ExtractConcertForm {
                   autovalidateMode: AutovalidateMode.always,
                   obscureText: true,
                 ),
-                TextWithButtonFormField<String>(
+                TextWithButtonFormField<Directory>(
                   buttonText: 'Choose',
                   decoration: const InputDecoration(
                       hintText: 'destination', labelText: 'Destination'),
                   onPressed: (state) async {
                     if (!context.mounted) return;
-                    String? selectedPath =
-                        await FilePickerWrapper.getDirectoryPath(
+                    Directory? selectedPath = await FilePicker.getDirectoryPath(
                       title: 'Select a location to extract the concert file',
                     );
                     if (selectedPath == null) return;
-                    txDest.text = selectedPath;
+                    txDest.text = selectedPath.path;
                     state.didChange(selectedPath);
                   },
                   onSaved: (v) => _dest = v!,
-                  validator: (v) => (v == null || v.isEmpty)
+                  validator: (v) => (v == null || !v.existsSync())
                       ? 'Please select a location'
                       : null,
                   txController: txDest,

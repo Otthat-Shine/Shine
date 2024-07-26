@@ -25,6 +25,8 @@ class FileManagerMiddleware extends GetMiddleware {
   GetPageBuilder? onPageBuildStart(GetPageBuilder? page) {
     try {
       controller.enableConcert = Get.arguments['enableConcert'];
+      controller.concertFile = Get.arguments['concertFile'];
+      controller.concertExtDir = Get.arguments['concertExtDir'];
     } finally {}
 
     controller.previousPath = controller.currentPath;
