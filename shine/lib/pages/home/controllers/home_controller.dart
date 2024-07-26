@@ -8,13 +8,12 @@ import 'package:permission_handler/permission_handler.dart';
 
 // Project imports:
 import 'package:shine/common/concert.dart';
-import 'package:shine/common/device_info.dart';
-import '../../../common/general_dialog.dart';
+import 'package:shine/common/permission_manager.dart';
 
 class HomeController extends GetxController {
   String? _extractionPath;
   String? _concertFilePath;
-  final List<Permission> _permissions = [Permission.storage];
+  PermissionManager? pm;
 
   set extractionPath(value) => _extractionPath = value;
 
@@ -24,60 +23,21 @@ class HomeController extends GetxController {
 
   get concertFilePath => _concertFilePath;
 
+  HomeController() {
+    if (Platform.isAndroid) {
+      pm = PermissionManager({
+        AndroidPermissionWrapper(permission: Permission.storage),
+        AndroidPermissionWrapper(permission: Permission.manageExternalStorage, minSdkVersion: 29),
+      }, feature: 'Create/Read Concert File');
+    }
+  }
+
   @override
   void onReady() async {
     super.onReady();
 
-    if (Platform.isAndroid) {
-      List<Permission> deniedPermissions = await checkPermissions();
-
-      if (deniedPermissions.isNotEmpty) {
-        String content = '';
-        for (var e in deniedPermissions) {
-          content += '\n$e\n';
-        }
-
-        await GeneralDialog.checkDialog(
-          'Request permissions',
-          'In order to use Shine normally, you need to give the following permissions:\n$content\nOtherwise, the program cannot be used',
-          onConfirm: () async {
-            await requestPermissions(deniedPermissions);
-          },
-          onCancel: () async {
-            exit(1);
-          },
-        );
-      }
-    }
-  }
-
-  Future<void> requestPermissions(List<Permission> permissions) async {
-    if (permissions.isEmpty) return;
-
-    for (var e in permissions) {
-      final status = await e.request();
-      if (status == PermissionStatus.denied ||
-          status == PermissionStatus.permanentlyDenied) {
-        await GeneralDialog.errorDialog(
-            'You have to give the $e permission, otherwise you cannot use it');
-        exit(1);
-      }
-    }
-  }
-
-  Future<List<Permission>> checkPermissions() async {
-    if (AndroidDeviceInfo.sdkVersion >= 29) {
-      _permissions.addAll([Permission.manageExternalStorage]);
-    }
-
-    List<Permission> deniedPermissions = [];
-
-    for (var e in _permissions) {
-      if (await e.isGranted) continue;
-      deniedPermissions.add(e);
-    }
-
-    return deniedPermissions;
+    // Request permissions
+    if (pm != null) await pm!.requestAll();
   }
 
   Future<void> createConcertFile(

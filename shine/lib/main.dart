@@ -14,11 +14,11 @@ import 'package:shine/common/device_info.dart';
 import 'package:shine/common/general_dialog.dart';
 import 'package:shine/routes/app_pages.dart';
 
-void main(List<String> args) async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await init();
+void main(List<String> args) {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await init();
 
-  runZonedGuarded(() {
     runApp(GetMaterialApp(
       initialRoute: AppPages.initial,
       debugShowCheckedModeBanner: false,
