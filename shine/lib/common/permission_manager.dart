@@ -8,10 +8,13 @@ import 'package:shine/common/dialogs.dart';
 export 'package:permission_handler/permission_handler.dart';
 
 class PermissionManager {
-  final Set<PermissionWrapper> _permissions;
+  final List<PermissionWrapper> _permissions;
+  late final List<PermissionWrapper> _availablePermissions;
   String? feature;
 
-  PermissionManager(this._permissions, {this.feature});
+  PermissionManager(this._permissions, {this.feature}) {
+    _availablePermissions = _permissions.where((v) => v.isAvailable).toList();
+  }
 
   Future<void> requestAll() async {
     if (await isGranted) return;
@@ -21,18 +24,18 @@ class PermissionManager {
       '''
 In order to use ${feature ?? 'this function'} normally, please give the following permissions:
 
-${_permissions.join('\n')}
-    ''',
+${_availablePermissions.join('\n')}
+      ''',
       onConfirm: () async {
-        for (var e in _permissions) {
-          await e.request();
+        for (var p in _availablePermissions) {
+          await p.request();
         }
       },
     );
   }
 
   Future<bool> get isGranted async {
-    for (var e in _permissions) {
+    for (var e in _availablePermissions) {
       if (await e.isGranted) continue;
       return e.isGranted;
     }
@@ -45,6 +48,8 @@ abstract class PermissionWrapper {
   final bool required;
 
   Future<bool> get isGranted => permission.isGranted;
+
+  bool get isAvailable;
 
   PermissionWrapper({required this.permission, this.required = true});
 
@@ -61,8 +66,12 @@ class AndroidPermissionWrapper extends PermissionWrapper {
   });
 
   @override
+  bool get isAvailable {
+    return AndroidDeviceInfo.sdkVersion >= minSdkVersion;
+  }
+
+  @override
   Future<void> request() async {
-    if (AndroidDeviceInfo.sdkVersion < minSdkVersion) return;
     final status = await permission.request();
 
     switch (status) {

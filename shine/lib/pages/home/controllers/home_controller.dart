@@ -14,11 +14,11 @@ class HomeController extends GetxController {
 
   HomeController() {
     if (Platform.isAndroid) {
-      pm = PermissionManager({
+      pm = PermissionManager([
         AndroidPermissionWrapper(permission: Permission.storage),
         AndroidPermissionWrapper(
             permission: Permission.manageExternalStorage, minSdkVersion: 29),
-      }, feature: 'Create/Read Concert File');
+      ], feature: 'Create/Read Concert File');
     }
   }
 
