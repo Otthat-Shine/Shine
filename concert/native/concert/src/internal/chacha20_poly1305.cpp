@@ -17,8 +17,6 @@ namespace concert::chacha20_poly1305 {
 int Encrypt(const std::string &source_file,
             const std::string &target_file,
             const std::string &password) {
-  setlocale(LC_ALL, "zh_CN.utf8");
-
   unsigned char buf_in[CHUNK_SIZE];
   unsigned char buf_out[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
   unsigned char header[crypto_secretstream_xchacha20poly1305_HEADERBYTES];
@@ -101,8 +99,6 @@ int Encrypt(const std::string &source_file,
 int Decrypt(const std::string &source_file,
             const std::string &target_file,
             const std::string &password) {
-  setlocale(LC_ALL, "zh_CN.utf8");
-
   unsigned char buf_in[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
   unsigned char buf_out[CHUNK_SIZE];
   unsigned char header[crypto_secretstream_xchacha20poly1305_HEADERBYTES];
