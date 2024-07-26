@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 // Project imports:
+import 'package:shine/common/dialogs.dart';
 import 'package:shine/common/file_picker_wrapper.dart';
-import 'package:shine/common/general_dialog.dart';
 import 'package:shine/widgets/forms.dart';
 
 class CreateConcertForm {
@@ -121,7 +121,7 @@ class CreateConcertForm {
                           formKey.currentState!.save();
                           Get.back();
                         } else {
-                          GeneralDialog.errorDialog('Please check the input');
+                          Dialogs.error('Please check the input');
                         }
                       },
                       child: const Text('Create'),
@@ -247,7 +247,7 @@ class ExtractConcertForm {
                           formKey.currentState!.save();
                           Get.back();
                         } else {
-                          GeneralDialog.errorDialog('Please check the input');
+                          Dialogs.error('Please check the input');
                         }
                       },
                       child: const Text('Extract'),

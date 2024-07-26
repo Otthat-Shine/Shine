@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
 // Project imports:
-import 'package:shine/common/general_dialog.dart';
+import 'package:shine/common/dialogs.dart';
 import 'package:shine/generated/assets.dart';
 import 'package:shine/generated/pubspec.dart';
 import 'package:shine/routes/app_pages.dart';
@@ -64,7 +64,7 @@ class Home extends GetView<HomeController> {
       EasyLoading.showSuccess('Create successfully');
     } catch (e) {
       EasyLoading.dismiss();
-      GeneralDialog.errorDialog(e.toString());
+      Dialogs.error(e.toString());
       return;
     }
   }
@@ -88,7 +88,7 @@ class Home extends GetView<HomeController> {
       EasyLoading.showSuccess('Extract successfully');
     } catch (e) {
       EasyLoading.dismiss();
-      GeneralDialog.errorDialog(e.toString());
+      Dialogs.error(e.toString());
       return;
     }
 

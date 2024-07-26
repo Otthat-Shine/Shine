@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
 // Project imports:
-import 'package:shine/common/general_dialog.dart';
+import 'package:shine/common/dialogs.dart';
 import 'package:shine/routes/app_pages.dart';
 import '../controllers/file_manager_controller.dart';
 
@@ -56,7 +56,7 @@ class FileSystemBlock extends GetView<FileManagerController> {
 
   void onTap() async {
     if (!entity.existsSync()) {
-      GeneralDialog.errorDialog('No such file or directory.');
+      Dialogs.error('No such file or directory.');
       return;
     }
 
@@ -105,7 +105,7 @@ class FileSystemBlock extends GetView<FileManagerController> {
   }
 
   Future<void> rename(BuildContext context) async {
-    final results = await GeneralDialog.openTextInputDialog(context,
+    final results = await Dialogs.textInput(context,
         title: 'Rename', hintText: 'new name...');
 
     if (results.isEmpty) return;
@@ -113,7 +113,7 @@ class FileSystemBlock extends GetView<FileManagerController> {
     try {
       controller.rename(results.first.trim(), entity);
     } catch (e) {
-      GeneralDialog.errorDialog(e.toString());
+      Dialogs.error(e.toString());
     }
 
     controller.refresh();
@@ -121,7 +121,7 @@ class FileSystemBlock extends GetView<FileManagerController> {
 
   Future<void> delete(BuildContext context) async {
     try {
-      await GeneralDialog.checkDialog(
+      await Dialogs.check(
         'Delete',
         'Are you sure you want to delete this file?',
         onConfirm: () {
@@ -130,7 +130,7 @@ class FileSystemBlock extends GetView<FileManagerController> {
         },
       );
     } catch (e) {
-      GeneralDialog.errorDialog(e.toString());
+      Dialogs.error(e.toString());
     }
   }
 }

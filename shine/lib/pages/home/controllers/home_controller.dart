@@ -4,7 +4,6 @@ import 'dart:isolate';
 
 // Package imports:
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 // Project imports:
 import 'package:shine/common/concert.dart';

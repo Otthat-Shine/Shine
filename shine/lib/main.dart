@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 
 // Project imports:
 import 'package:shine/common/device_info.dart';
-import 'package:shine/common/general_dialog.dart';
+import 'package:shine/common/dialogs.dart';
 import 'package:shine/routes/app_pages.dart';
 
 void main(List<String> args) {
@@ -31,7 +31,7 @@ void main(List<String> args) {
       ),
     ));
   }, (e, s) {
-    GeneralDialog.errorDialog(e.toString());
+    Dialogs.error(e.toString());
   });
 }
 

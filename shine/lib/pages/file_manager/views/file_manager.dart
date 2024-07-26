@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:open_file_manager/open_file_manager.dart' as open_file_manager;
 
 // Project imports:
-import 'package:shine/common/general_dialog.dart';
+import 'package:shine/common/dialogs.dart';
 import 'package:shine/pages/home/controllers/home_controller.dart';
 import '../controllers/file_manager_controller.dart';
 import 'filesystem_list.dart';
@@ -50,7 +50,7 @@ class FileManager extends GetView<FileManagerController> {
       try {
         Process.runSync('explorer.exe', [controller.currentPath]);
       } catch (e) {
-        GeneralDialog.errorDialog('Failed to open the file manager');
+        Dialogs.error('Failed to open the file manager');
       }
     } else if (Platform.isAndroid) {
       bool result = await open_file_manager.openFileManager(
@@ -60,7 +60,7 @@ class FileManager extends GetView<FileManagerController> {
       );
 
       if (!result) {
-        GeneralDialog.errorDialog('Failed to open the file manager');
+        Dialogs.error('Failed to open the file manager');
         return;
       }
     }
@@ -97,7 +97,7 @@ class FileManager extends GetView<FileManagerController> {
   }
 
   void newFile(BuildContext context) async {
-    final results = await GeneralDialog.openTextInputDialog(context,
+    final results = await Dialogs.textInput(context,
         title: 'New File', hintText: 'new file name...');
 
     if (results.isEmpty) return;
@@ -105,14 +105,14 @@ class FileManager extends GetView<FileManagerController> {
     try {
       controller.newFile(results.first.trim());
     } catch (e) {
-      GeneralDialog.errorDialog(e.toString());
+      Dialogs.error(e.toString());
     }
 
     controller.refresh();
   }
 
   void newFolder(BuildContext context) async {
-    final results = await GeneralDialog.openTextInputDialog(context,
+    final results = await Dialogs.textInput(context,
         title: 'New Folder', hintText: 'new folder name...');
 
     if (results.isEmpty) return;
@@ -120,7 +120,7 @@ class FileManager extends GetView<FileManagerController> {
     try {
       controller.newFolder(results.first.trim());
     } catch (e) {
-      GeneralDialog.errorDialog(e.toString());
+      Dialogs.error(e.toString());
     }
 
     controller.refresh();
@@ -198,7 +198,7 @@ class SaveAsConcertFile extends StatelessWidget {
 
   Future<void> onPressed(BuildContext context) async {
     bool isOK = false;
-    await GeneralDialog.checkDialog(
+    await Dialogs.check(
       'Save',
       'Do you want to save your changes?\nNote: This will save all the files in the directory',
       onConfirm: () => isOK = true,
@@ -213,23 +213,22 @@ class SaveAsConcertFile extends StatelessWidget {
     final fileEntityList = extractionPath.listSync();
 
     if (!extractionPath.existsSync()) {
-      GeneralDialog.errorDialog('${extractionPath.path} does not exist');
+      Dialogs.error('${extractionPath.path} does not exist');
       return;
     }
 
     if (fileEntityList.isEmpty) {
-      GeneralDialog.errorDialog('Directory is empty');
+      Dialogs.error('Directory is empty');
       return;
     }
 
     if (!File(homeController.concertFilePath).existsSync()) {
-      await GeneralDialog.errorDialog(
-          '${homeController.concertFilePath} does not exist');
+      await Dialogs.error('${homeController.concertFilePath} does not exist');
       return;
     }
 
     if (!context.mounted) return;
-    List<String> newPassword = await GeneralDialog.openTextInputDialog(
+    List<String> newPassword = await Dialogs.textInput(
       context,
       title: 'Please enter the password',
       hintText: 'password...',
@@ -249,7 +248,7 @@ class SaveAsConcertFile extends StatelessWidget {
       EasyLoading.showSuccess('Write successfully');
     } catch (e) {
       EasyLoading.dismiss();
-      GeneralDialog.errorDialog(e.toString());
+      Dialogs.error(e.toString());
       return;
     }
   }

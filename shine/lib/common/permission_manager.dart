@@ -3,7 +3,9 @@ import 'package:permission_handler/permission_handler.dart';
 
 // Project imports:
 import 'package:shine/common/device_info.dart';
-import 'package:shine/common/general_dialog.dart';
+import 'package:shine/common/dialogs.dart';
+
+export 'package:permission_handler/permission_handler.dart';
 
 class PermissionManager {
   final Set<PermissionWrapper> _permissions;
@@ -12,7 +14,9 @@ class PermissionManager {
   PermissionManager(this._permissions, {this.feature});
 
   Future<void> requestAll() async {
-    await GeneralDialog.checkDialog(
+    if (await isGranted) return;
+
+    await Dialogs.check(
       'Permission',
       '''
 In order to use ${feature ?? 'this function'} normally, please give the following permissions:
@@ -26,11 +30,21 @@ ${_permissions.join('\n')}
       },
     );
   }
+
+  Future<bool> get isGranted async {
+    for (var e in _permissions) {
+      if (await e.isGranted) continue;
+      return e.isGranted;
+    }
+    return true;
+  }
 }
 
 abstract class PermissionWrapper {
   final Permission permission;
   final bool required;
+
+  Future<bool> get isGranted => permission.isGranted;
 
   PermissionWrapper({required this.permission, this.required = true});
 
@@ -65,7 +79,7 @@ class AndroidPermissionWrapper extends PermissionWrapper {
 
   Future<void> _onDenied() async {
     if (!required) return;
-    await GeneralDialog.checkDialog(
+    await Dialogs.check(
       'Permission',
       'You must give ${toString()}, otherwise you cannot use this feature.',
       onConfirm: () async {
@@ -76,7 +90,7 @@ class AndroidPermissionWrapper extends PermissionWrapper {
 
   Future<void> _onPermanentlyDenied() async {
     if (!required) return;
-    GeneralDialog.errorDialog(
+    Dialogs.warning(
         '''You must give ${toString()}, otherwise you cannot use this feature.''');
   }
 
