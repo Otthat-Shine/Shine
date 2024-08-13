@@ -124,13 +124,13 @@ sealed class Pubspec {
   /// Build date and time (UTC)
   static final DateTime timestamp = DateTime.utc(
     2024,
-    7,
-    26,
-    11,
-    17,
-    12,
-    682,
-    476,
+    8,
+    13,
+    2,
+    42,
+    47,
+    472,
+    642,
   );
 
   /// Name
@@ -421,7 +421,6 @@ sealed class Pubspec {
     'uuid': r'^4.4.0',
     'permission_handler': r'^11.3.1',
     'device_info_plus': r'^10.1.0',
-    'open_file_manager': r'^1.0.2',
     'flutter_easyloading': r'^3.0.5',
     'filesaverz': r'^3.2.1',
     'video_player': r'^2.8.6',

@@ -1,13 +1,9 @@
-// Dart imports:
-import 'dart:io';
-
 // Flutter imports:
 import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:path/path.dart' as p;
 
 // Project imports:
 import 'package:shine/common/dialogs.dart';
@@ -25,6 +21,7 @@ class Home extends GetView<HomeController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shine'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: const [
           _OtherOptions(),
         ],
@@ -34,7 +31,7 @@ class Home extends GetView<HomeController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () async => await _createConcertFile(context),
+              onPressed: () async => await createConcertFile(context),
               child: const Text('Create Concert File'),
             ),
             const SizedBox(height: 20),
@@ -48,7 +45,7 @@ class Home extends GetView<HomeController> {
     );
   }
 
-  Future<void> _createConcertFile(BuildContext context) async {
+  Future<void> createConcertFile(BuildContext context) async {
     CreateConcertForm concertForm = CreateConcertForm();
     await concertForm.show(context);
 
@@ -99,8 +96,8 @@ class Home extends GetView<HomeController> {
       AppRoutes.fileManager,
       preventDuplicates: false,
       arguments: {
-        'enableConcert': true,
         'path': concertForm.dest!.path,
+        'enableConcert': true,
         'concertFile': concertForm.concertFile,
         'concertExtDir': concertForm.dest,
       },

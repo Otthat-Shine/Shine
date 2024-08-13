@@ -1,6 +1,5 @@
 // Package imports:
 import 'package:get/get.dart';
-import 'package:path/path.dart';
 
 // Project imports:
 import 'package:shine/pages/home/controllers/home_controller.dart';
@@ -23,24 +22,26 @@ class FileManagerMiddleware extends GetMiddleware {
 
   @override
   GetPageBuilder? onPageBuildStart(GetPageBuilder? page) {
-    try {
-      controller.enableConcert = Get.arguments['enableConcert'];
-      controller.concertFile = Get.arguments['concertFile'];
-      controller.concertExtDir = Get.arguments['concertExtDir'];
-    } finally {}
+      controller.enableConcert = Get.arguments['enableConcert'] ?? false;
+      if (controller.enableConcert) {
+        controller.concertFile = Get.arguments['concertFile'];
+        controller.concertExtDir = Get.arguments['concertExtDir'];
+      }
 
-    controller.previousPath = controller.currentPath;
     controller.currentPath = Get.arguments['path'];
+    controller.addHistory(controller.currentPath);
 
-    controller.refresh();
     return super.onPageBuildStart(page);
   }
 
   @override
   void onPageDispose() {
-    controller.currentPath = controller.previousPath;
-    controller.previousPath = dirname(controller.previousPath ?? '');
-    controller.refresh();
+    controller.removeLastHistory();
+    if (controller.isHistoryEmpty) return;
+    controller.currentPath = controller.lastHistory;
+
+    controller.updateFileSystemList();
+
     super.onPageDispose();
   }
 }

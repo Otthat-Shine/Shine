@@ -51,6 +51,6 @@ class VideoPlayerException implements Exception {
 
   @override
   String toString() {
-    return '$VideoPlayerException: $msg';
+    return 'VideoPlayerException: $msg';
   }
 }

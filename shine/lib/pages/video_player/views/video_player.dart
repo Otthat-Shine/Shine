@@ -20,6 +20,7 @@ class VideoPlayer extends GetView<VideoPlayerController> {
     return Scaffold(
       appBar: AppBar(
         title: Text(controller.path),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: JkVideoControlPanel(
         videoPlayerController,

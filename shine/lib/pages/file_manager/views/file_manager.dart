@@ -1,13 +1,9 @@
-// Dart imports:
-import 'dart:io';
-
 // Flutter imports:
 import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:open_file_manager/open_file_manager.dart' as open_file_manager;
 
 // Project imports:
 import 'package:shine/common/dialogs.dart';
@@ -23,47 +19,24 @@ class FileManager extends GetView<FileManagerController> {
     return Scaffold(
       appBar: AppBar(
         title: Text(controller.currentPath),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
           Offstage(
-              offstage: !controller.enableConcert, child: SaveAsConcertFile()),
+            offstage: !controller.enableConcert,
+            child: SaveAsConcertFile(),
+          ),
           const _OtherOptions(),
         ],
       ),
-      body: Obx(
-        () => GestureDetector(
-          child: FileSystemList(entities: controller.entities),
-          onTap: () {
-            controller.refresh();
-          },
-          onLongPressStart: (details) => showContextMenu(context, details),
-        ),
+      body: GestureDetector(
+        child: const FileSystemList(),
+        onLongPressStart: (details) => showContextMenu(context, details),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async => await openFileManager(),
         child: const Icon(Icons.open_in_new),
       ),
     );
-  }
-
-  Future<void> openFileManager() async {
-    if (Platform.isWindows) {
-      try {
-        Process.runSync('explorer.exe', [controller.currentPath]);
-      } catch (e) {
-        Dialogs.error('Failed to open the file manager');
-      }
-    } else if (Platform.isAndroid) {
-      bool result = await open_file_manager.openFileManager(
-        androidConfig: open_file_manager.AndroidConfig(
-          folderType: open_file_manager.FolderType.download,
-        ),
-      );
-
-      if (!result) {
-        Dialogs.error('Failed to open the file manager');
-        return;
-      }
-    }
   }
 
   void showContextMenu(BuildContext context, LongPressStartDetails details) {
@@ -75,25 +48,25 @@ class FileManager extends GetView<FileManagerController> {
         details.globalPosition.dx,
         details.globalPosition.dy,
       ),
-      items: getContextMenuOptions(context),
+      items: [
+        PopupMenuItem(
+          child: const Text('New File'),
+          onTap: () => newFile(context),
+        ),
+        PopupMenuItem(
+          child: const Text('New Folder'),
+          onTap: () => newFolder(context),
+        ),
+        PopupMenuItem(
+          child: const Text('Refresh'),
+          onTap: () => controller.updateFileSystemList(),
+        ),
+      ],
     );
   }
 
-  List<PopupMenuEntry> getContextMenuOptions(BuildContext context) {
-    return [
-      PopupMenuItem(
-        child: const Text('New File'),
-        onTap: () => newFile(context),
-      ),
-      PopupMenuItem(
-        child: const Text('New Folder'),
-        onTap: () => newFolder(context),
-      ),
-      PopupMenuItem(
-        child: const Text('Refresh'),
-        onTap: () => controller.refresh(),
-      ),
-    ];
+  Future<void> openFileManager() async {
+    throw UnimplementedError();
   }
 
   void newFile(BuildContext context) async {
@@ -108,7 +81,7 @@ class FileManager extends GetView<FileManagerController> {
       Dialogs.error(e.toString());
     }
 
-    controller.refresh();
+    controller.updateFileSystemList();
   }
 
   void newFolder(BuildContext context) async {
@@ -123,7 +96,7 @@ class FileManager extends GetView<FileManagerController> {
       Dialogs.error(e.toString());
     }
 
-    controller.refresh();
+    controller.updateFileSystemList();
   }
 }
 
@@ -172,12 +145,12 @@ class _OtherOptions extends GetView<FileManagerController> {
 
   void setSortType(SortType sortType) {
     controller.sortType = sortType;
-    controller.refresh();
+    controller.updateFileSystemList();
   }
 
   void setSortOrder(SortOrder sortOrder) {
     controller.sortOrder = sortOrder;
-    controller.refresh();
+    controller.updateFileSystemList();
   }
 }
 

@@ -37,7 +37,6 @@ dependencies:
   uuid: ^4.4.0
   permission_handler: ^11.3.1
   device_info_plus: ^10.1.0
-  open_file_manager: ^1.0.2
   flutter_easyloading: ^3.0.5
   filesaverz: ^3.2.1
   video_player: ^2.8.6

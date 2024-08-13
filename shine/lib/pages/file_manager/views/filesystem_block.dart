@@ -29,27 +29,29 @@ class FileSystemBlock extends GetView<FileManagerController> {
       onLongPressStart: (details) {
         onLongPressStart(context, details);
       },
-      child: ListTile(
-        title: Text(p.basename(entity.path)),
-        subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              'Date: ${stat.modified.toString()}',
-              style: const TextStyle(fontSize: 10),
-            ),
-            const Text('\t'),
-            stat.type != FileSystemEntityType.directory
-                ? Text(
-                    'Size: ${(stat.size / 1024 / 1024).ceil()} MB',
-                    style: const TextStyle(fontSize: 10),
-                  )
-                : const Text(''),
-          ],
+      child: Card(
+        child: ListTile(
+          title: Text(p.basename(entity.path)),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'Date: ${stat.modified.toString()}',
+                style: const TextStyle(fontSize: 10),
+              ),
+              const Text('\t'),
+              stat.type != FileSystemEntityType.directory
+                  ? Text(
+                      'Size: ${(stat.size / 1024 / 1024).ceil()} MB',
+                      style: const TextStyle(fontSize: 10),
+                    )
+                  : const Text(''),
+            ],
+          ),
+          tileColor: color,
+          leading: icon,
+          onTap: onTap,
         ),
-        tileColor: color,
-        leading: icon,
-        onTap: onTap,
       ),
     );
   }
@@ -83,31 +85,24 @@ class FileSystemBlock extends GetView<FileManagerController> {
         details.globalPosition.dx,
         details.globalPosition.dy,
       ),
-      items: getContextMenuOptions(context),
+      items: [
+        PopupMenuItem(
+            child: const Text('Rename'), onTap: () => rename(context)),
+        PopupMenuItem(
+            child: const Text('Delete'), onTap: () => delete(context)),
+      ],
     );
-  }
-
-  List<PopupMenuEntry> getContextMenuOptions(BuildContext context) {
-    return [
-      PopupMenuItem(child: const Text('Rename'), onTap: () => rename(context)),
-      PopupMenuItem(child: const Text('Delete'), onTap: () => delete(context)),
-    ];
   }
 
   void openFile() {
     if (entity.path.isVideoFileName) {
-      playVideo(entity.path);
+      controller.playVideo(entity.path);
     }
-  }
-
-  void playVideo(String path) {
-    Get.toNamed(AppRoutes.videoPlayer, parameters: {'path': path});
   }
 
   Future<void> rename(BuildContext context) async {
     final results = await Dialogs.textInput(context,
         title: 'Rename', hintText: 'new name...');
-
     if (results.isEmpty) return;
 
     try {
@@ -116,7 +111,7 @@ class FileSystemBlock extends GetView<FileManagerController> {
       Dialogs.error(e.toString());
     }
 
-    controller.refresh();
+    controller.updateFileSystemList();
   }
 
   Future<void> delete(BuildContext context) async {
@@ -126,7 +121,7 @@ class FileSystemBlock extends GetView<FileManagerController> {
         'Are you sure you want to delete this file?',
         onConfirm: () {
           controller.delete(entity);
-          controller.refresh();
+          controller.updateFileSystemList();
         },
       );
     } catch (e) {
