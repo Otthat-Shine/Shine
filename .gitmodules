@@ -4,3 +4,6 @@
 [submodule "concert/native/concert/third_party/otthat_libsodium"]
 	path = concert/native/concert/third_party/otthat_libsodium
 	url = https://github.com/Otthat-Shine/otthat_libsodium.git
+[submodule "concert/native/concert/third_party/otthat_7zip"]
+	path = concert/native/concert/third_party/otthat_7zip
+	url = https://github.com/Otthat-Shine/otthat_7zip.git

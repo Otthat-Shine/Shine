@@ -1,11 +1,11 @@
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:concert/gen/concert.dart';
+import 'package:concert/generated/concert.dart';
 import 'package:ffi/ffi.dart';
 import 'package:uuid/uuid.dart';
 
-export 'package:concert/gen/concert.dart';
+export 'package:concert/generated/concert.dart';
 import 'package:path/path.dart' as p;
 
 extension FFIString on String {
@@ -21,15 +21,15 @@ extension FFIPointerUtf8 on Pointer<Char> {
 }
 
 class Concert {
-  late final GenConcert _genConcert;
+  late final GeneratedConcert _genConcert;
 
   Concert() {
     if (Platform.isWindows) {
       DynamicLibrary library = DynamicLibrary.open("concert.dll");
-      _genConcert = GenConcert(library);
+      _genConcert = GeneratedConcert(library);
     } else if (Platform.isAndroid) {
       DynamicLibrary library = DynamicLibrary.open("libconcert.so");
-      _genConcert = GenConcert(library);
+      _genConcert = GeneratedConcert(library);
     } else {
       throw "Unsupported Platform";
     }
@@ -96,7 +96,7 @@ class Concert {
     }
   }
 
-  GenConcert get func {
+  GeneratedConcert get func {
     return _genConcert;
   }
 }
