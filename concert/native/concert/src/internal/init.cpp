@@ -5,16 +5,19 @@
 #define SODIUM_STATIC
 #include <sodium.h>
 
+#include <clocale>
+
 #if defined(_WIN32)
 #include <windows.h>
 #else
 #include <stdexcept>
 #endif
 
-bool init() {
+bool Init() {
   if (sodium_init() != 0) {
     return false;
   }
+  setlocale(LC_ALL, "zh_CN.UTF-8");
 
   return true;
 }
@@ -27,7 +30,7 @@ BOOL WINAPI DllMain(
   // Perform actions based on the reason for calling.
   switch (fdwReason) {
     case DLL_PROCESS_ATTACH:
-      return init();
+      return Init();
     case DLL_THREAD_ATTACH:
       break;
     case DLL_THREAD_DETACH:
@@ -39,7 +42,7 @@ BOOL WINAPI DllMain(
 }
 #else
 __attribute__((constructor)) void onLoad() {
-  if (!init()) {
+  if (!Init()) {
     throw std::runtime_error("Initialization failed");
   }
 }

@@ -18,10 +18,7 @@ int Compress(const std::string &list_of_file,
              const std::string &password) {
   using namespace bit7z;
 
-  setlocale(LC_ALL, "zh_CN.utf8");
-
   try {
-    std::cerr << list_of_file << std::endl;
     if (list_of_file.empty()) {
       return CONCERT_ZIP_EMPTY_FILE_LIST;
     }
@@ -70,8 +67,6 @@ int CompressDirectory(const std::string &dir_path,
                       int compression_level,
                       const std::string &password) {
   using namespace bit7z;
-
-  setlocale(LC_ALL, "zh_CN.utf8");
 
   try {
     if (!std::filesystem::is_directory(dir_path)) {

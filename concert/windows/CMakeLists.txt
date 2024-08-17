@@ -99,6 +99,20 @@ include(GoogleTest)
 gtest_discover_tests(${TEST_RUNNER})
 endif()
 
+# Concert
 set(TARGET_PLATFORM "windows" CACHE STRING "TARGET_PLATFORM")
+if (
+        CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64" OR
+        CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "AMD64"
+)
+    message(STATUS "x86_64 architecture detected")
+    set(TARGET_ARCH "x86_64" CACHE STRING "TARGET_ARCH")
+elseif (CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "ARM64")
+    message(STATUS "arm64 architecture detected")
+    set(TARGET_ARCH "arm64" CACHE STRING "TARGET_ARCH")
+else()
+    message(FATAL_ERROR "Host processor architecture is unknown")
+endif()
 set(CONCERT_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../../concert/native/concert")
+
 add_subdirectory("${CONCERT_SOURCE_DIR}" concert)

@@ -3,119 +3,61 @@ import 'dart:io';
 import 'dart:isolate';
 
 // Package imports:
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 // Project imports:
 import 'package:shine/common/concert.dart';
-import '../../../common/general_dialog.dart';
+import 'package:shine/common/permission_manager.dart';
 
 class HomeController extends GetxController {
-  String? _extractionPath;
-  String? _concertFilePath;
-  final List<Permission> _permissions = [Permission.storage];
+  PermissionManager? pm;
 
-  set extractionPath(value) => _extractionPath = value;
-
-  get extractionPath => _extractionPath;
-
-  set concertFilePath(value) => _concertFilePath = value;
-
-  get concertFilePath => _concertFilePath;
+  HomeController() {
+    if (Platform.isAndroid) {
+      pm = PermissionManager([
+        AndroidPermissionWrapper(permission: Permission.storage),
+        AndroidPermissionWrapper(
+            permission: Permission.manageExternalStorage, minSdkVersion: 29),
+      ], feature: 'Create/Read Concert File');
+    }
+  }
 
   @override
   void onReady() async {
     super.onReady();
 
-    if (Platform.isAndroid) {
-      List<Permission> deniedPermissions = await checkPermissions();
-
-      if (deniedPermissions.isNotEmpty) {
-        String content = '';
-        for (var e in deniedPermissions) {
-          content += '\n$e\n';
-        }
-
-        await GeneralDialog.checkDialog(
-          'Request permissions',
-          'In order to use Shine normally, you need to give the following permissions:\n$content\nOtherwise, the program cannot be used',
-          onConfirm: () async {
-            await requestPermissions(deniedPermissions);
-          },
-          onCancel: () async {
-            exit(1);
-          },
-        );
-      }
-    }
-  }
-
-  Future<void> requestPermissions(List<Permission> permissions) async {
-    if (permissions.isEmpty) return;
-
-    for (var e in permissions) {
-      final status = await e.request();
-      if (status == PermissionStatus.denied ||
-          status == PermissionStatus.permanentlyDenied) {
-        await GeneralDialog.errorDialog(
-            'You have to give the $e permission, otherwise you cannot use it');
-        exit(1);
-      }
-    }
-  }
-
-  Future<List<Permission>> checkPermissions() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-
-    int sdkVersion = (await deviceInfo.androidInfo).version.sdkInt;
-
-    if (sdkVersion >= 29) {
-      _permissions.addAll([Permission.manageExternalStorage]);
-    }
-
-    List<Permission> deniedPermissions = [];
-
-    for (var e in _permissions) {
-      if (await e.isGranted) continue;
-      deniedPermissions.add(e);
-    }
-
-    return deniedPermissions;
+    // Request permissions
+    if (pm != null) await pm!.requestAll();
   }
 
   Future<void> createConcertFile(
-    List<String> files,
-    String path,
+    List<FileSystemEntity> files,
+    File dest,
     String password,
   ) async {
     bool result = await Isolate.run(() {
-      bool result = concert.create(files, path, password);
+      bool result = concert.create(
+        files.map((v) => v.path).toList(),
+        dest.path,
+        password,
+      );
       return result;
     });
     if (!result) throw HomeException('Failed to create concert file');
   }
 
   Future<void> extractConcertFile(
-    String src,
-    String dest,
+    File src,
+    Directory dest,
     String password,
   ) async {
-    Directory(dest).createSync(recursive: true);
+    dest.createSync(recursive: true);
 
     bool result = await Isolate.run(() {
-      bool result = concert.extract(src, dest, password);
+      bool result = concert.extract(src.path, dest.path, password);
       return result;
     });
     if (!result) throw HomeException('Failed to extract concert file');
-
-    _extractionPath = dest;
-    _concertFilePath = src;
-  }
-
-  void clear() {
-    _extractionPath = '';
-    _concertFilePath = '';
   }
 }
 

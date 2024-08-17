@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:get/get.dart';
 
-class GeneralDialog {
-  static Future<void> warningDialog(String content) async {
+class Dialogs {
+  static Future<void> warning(String content, {bool readonly = false}) async {
     await Get.defaultDialog(
       title: 'Warning',
-      content: Text(content),
+      content: readonly ? Text(content) : SelectableText(content),
       confirm: ElevatedButton(
         onPressed: () => Get.back(),
         child: const Text('OK'),
@@ -17,10 +17,10 @@ class GeneralDialog {
     );
   }
 
-  static Future<void> errorDialog(String content) async {
+  static Future<void> error(String content, {bool readonly = false}) async {
     await Get.defaultDialog(
       title: 'Error',
-      content: Text(content),
+      content: readonly ? Text(content) : SelectableText(content),
       confirm: ElevatedButton(
         onPressed: () => Get.back(),
         child: const Text('OK'),
@@ -28,15 +28,16 @@ class GeneralDialog {
     );
   }
 
-  static Future<void> checkDialog(
+  static Future<void> check(
     String title,
     String content, {
     void Function()? onConfirm,
     void Function()? onCancel,
+    bool readonly = false,
   }) async {
     await Get.defaultDialog(
       title: title,
-      content: Text(content),
+      content: readonly ? Text(content) : SelectableText(content),
       confirm: ElevatedButton(
         onPressed: () {
           if (onConfirm != null) onConfirm();
@@ -54,7 +55,7 @@ class GeneralDialog {
     );
   }
 
-  static Future<List<String>> openTextInputDialog(
+  static Future<List<String>> textInput(
     BuildContext context, {
     required String title,
     required String hintText,

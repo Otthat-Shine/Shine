@@ -1,5 +1,6 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:io';
 
 // Flutter imports:
 import 'package:flutter/material.dart';
@@ -9,13 +10,15 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 // Project imports:
-import 'package:shine/common/general_dialog.dart';
+import 'package:shine/common/device_info.dart';
+import 'package:shine/common/dialogs.dart';
 import 'package:shine/routes/app_pages.dart';
 
 void main(List<String> args) {
-  init();
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await init();
 
-  runZonedGuarded(() {
     runApp(GetMaterialApp(
       initialRoute: AppPages.initial,
       debugShowCheckedModeBanner: false,
@@ -28,11 +31,11 @@ void main(List<String> args) {
       ),
     ));
   }, (e, s) {
-    GeneralDialog.errorDialog(e.toString());
+    Dialogs.error(e.toString());
   });
 }
 
-void init() {
+Future<void> init() async {
   // Flutter Easy Loading
   EasyLoading.instance
     ..displayDuration = const Duration(milliseconds: 2000)
@@ -43,4 +46,7 @@ void init() {
     ..maskColor = Colors.blue.withOpacity(0.5)
     ..userInteractions = true
     ..dismissOnTap = false;
+
+  // Android Device Info
+  if (Platform.isAndroid) await AndroidDeviceInfo.init();
 }

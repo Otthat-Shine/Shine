@@ -1,0 +1,166 @@
+name: Build
+
+on: 
+    push:
+        tags:
+            - 'v*.*.*'
+
+jobs:
+    build_apk:
+        name: Build Apk
+        runs-on: windows-latest
+
+        steps:
+            - name: Clone Repository
+              uses: actions/checkout@v4
+              with:
+                submodules: true
+
+            - name: Get tag
+              id: tag
+              uses: devops-actions/action-get-tag@v1.0.3
+              with:
+                strip_v: true
+
+            - name: Setup Java
+              uses: actions/setup-java@v4
+              with:
+                distribution: 'zulu'
+                java-version: '17'
+
+            - name: Setup Android SDK
+              uses: android-actions/setup-android@v3
+  
+            - name: Setup Android NDK
+              run: sdkmanager "ndk;23.1.7779620"
+
+            - name: Setup CMake
+              run: sdkmanager "cmake;3.22.1"
+
+            - name: Setup Flutter SDK
+              uses: subosito/flutter-action@v2
+              with:
+                channel: stable
+                flutter-version: 3.22.1
+
+            - name: Flutter Doctor
+              run: flutter doctor -v
+
+            - name: Dart Pub Get (workflows)
+              run: dart pub get -C ./workflows/
+
+            - name: Build Apk
+              run: dart "./workflows/bin/workflows.dart" build android --version="${{ steps.tag.outputs.tag }}"
+
+            - name: Upload Build Targets
+              uses: actions/upload-artifact@v3
+              with:
+                name: build_targets
+                path: ./build/android
+    
+    build_win_x64_exe:
+        name: Build Windows Executable (x64)
+        runs-on: windows-latest
+
+        steps:
+            - name: Clone Repository
+              uses: actions/checkout@v4
+              with:
+                submodules: true
+
+            - name: Get tag
+              id: tag
+              uses: devops-actions/action-get-tag@v1.0.3
+              with:
+                strip_v: true
+
+            - name: Setup Microsoft Visual C++
+              uses: ilammy/msvc-dev-cmd@v1
+              with:
+                arch: x64
+
+            - name: Setup 7zip
+              uses: milliewalky/setup-7-zip@v1
+
+            - name: Setup Flutter SDK
+              uses: subosito/flutter-action@v2
+              with:
+                channel: stable
+                flutter-version: 3.22.1
+
+            - name: Flutter Doctor
+              run: flutter doctor -v
+
+            - name: Dart Pub Get (workflows)
+              run: dart pub get -C ./workflows/
+
+            - name: Build Windows Executable
+              run: dart "./workflows/bin/workflows.dart" build windows  --target-arch=x64 --version="${{ steps.tag.outputs.tag }}"
+
+            - name: Upload Build Targets
+              uses: actions/upload-artifact@v3
+              with:
+                name: build_targets
+                path: ./build/windows
+
+
+    release:
+        name: Release
+        runs-on: windows-latest
+        needs: [ build_apk, build_win_x64_exe ]
+
+        steps:
+            - name: Get tag
+              id: tag
+              uses: devops-actions/action-get-tag@v1.0.3
+
+            - name: Download Build Targets
+              uses: actions/download-artifact@v3
+              with:
+                name: build_targets
+                path: build/
+
+            - name: Generate Release Notes
+              uses: mikepenz/release-changelog-builder-action@v5
+              id: release_notes
+              with:
+                configurationJson: |
+                  {
+                    "categories": [
+                        {
+                            "title": "## Features",
+                            "labels": ["feature"]
+                        },
+                        {
+                            "title": "## Fixes",
+                            "labels": ["fix"]
+                        },
+                        {
+                            "title": "## Tests",
+                            "labels": ["test"]
+                        }
+                    ],
+                    "ignore_labels": ["ignore"],
+                    "sort": {
+                        "order": "ASC",
+                        "on_property": "mergedAt"
+                    },
+                    "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>\n**Full Changelog**: ${{ github.server_url }}/${{ github.repository }}/commits/${{ steps.tag.outputs.tag }}",
+                    "pr_template": "- #{{TITLE}} @#{{AUTHOR}} - PR: ##{{NUMBER}}",
+                    "empty_template": "**Full Changelog**: ${{ github.server_url }}/${{ github.repository }}/commits/${{ steps.tag.outputs.tag }}",
+                    "max_tags_to_fetch": 200,
+                    "max_pull_requests": 200,
+                    "max_back_track_time_days": 365
+                  }
+                toTag: ${{ steps.tag.outputs.tag }}
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Release
+              uses: ncipollo/release-action@v1
+              with:
+                artifacts: "build/*"
+                name: Shine ${{ steps.tag.outputs.tag }}
+                body: ${{ steps.release_notes.outputs.changelog }}
+                token: ${{ secrets.GITHUB_TOKEN }}
+              

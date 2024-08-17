@@ -5,6 +5,9 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
+// Project imports:
+import 'package:shine/routes/app_pages.dart';
+
 enum SortType { name, date, size }
 
 enum SortOrder { asc, desc }
@@ -16,7 +19,10 @@ extension on List<FileSystemEntity> {
     switch (sortType) {
       case SortType.name:
         sort((a, b) {
-          return p.basename(a.path).compareTo(p.basename(b.path).toLowerCase());
+          return p
+              .basename(a.path)
+              .toLowerCase()
+              .compareTo(p.basename(b.path).toLowerCase());
         });
         break;
       case SortType.date:
@@ -46,113 +52,79 @@ extension on List<FileSystemEntity> {
 }
 
 class FileManagerController extends GetxController {
+  String currentPath = '';
+  final List<String> _history = [];
+  SortType sortType = SortType.name;
+  SortOrder sortOrder = SortOrder.asc;
+
+  // Concert extension
   bool enableConcert = false;
+  File? concertFile;
+  Directory? concertExtDir;
 
-  String? _previousPath;
-  String? _currentPath;
+  Future<List<FileSystemEntity>> getEntities() async {
+    final dir = Directory(currentPath);
 
-  List<FileSystemEntity> _dirEntities = [];
-  List<FileSystemEntity> _fileEntities = [];
-  final _entities = <FileSystemEntity>[].obs;
-
-  final _sortType = SortType.name.obs;
-  final _sortOrder = SortOrder.asc.obs;
-
-  set currentPath(value) => _currentPath = value;
-
-  get currentPath => _currentPath;
-
-  set previousPath(value) => _previousPath = value;
-
-  get previousPath => _previousPath;
-
-  set entities(value) => _entities.value = value;
-
-  get entities => _entities.toList();
-
-  set dirEntities(value) => _dirEntities = value;
-
-  get dirEntities => _dirEntities;
-
-  set fileEntities(value) => _fileEntities = value;
-
-  get fileEntities => _fileEntities;
-
-  set sortType(value) => _sortType.value = value;
-
-  get sortType => _sortType.value;
-
-  set sortOrder(value) => _sortOrder.value = value;
-
-  get sortOrder => _sortOrder.value;
-
-  void getEntities() {
-    if (currentPath == null) return;
-
-    final dir = Directory(_currentPath!);
-
-    if (!dir.existsSync()) {
+    if (!(await dir.exists())) {
       throw FileManagerException('Directory does not exist.');
     }
 
-    List<FileSystemEntity> entities = dir.listSync();
-    try {
-      _dirEntities = entities
-          .where((element) => FileSystemEntity.isDirectorySync(element.path))
-          .toList();
+    List<FileSystemEntity> entities = await dir.list().toList();
+    var dirEntities = entities
+        .where((element) => FileSystemEntity.isDirectorySync(element.path))
+        .toList();
 
-      _fileEntities = entities
-          .where((element) => !FileSystemEntity.isDirectorySync(element.path))
-          .toList();
+    var fileEntities = entities
+        .where((element) => !FileSystemEntity.isDirectorySync(element.path))
+        .toList();
 
-      sort();
+    dirEntities = dirEntities.sortBy(sortType, sortOrder);
+    fileEntities = fileEntities.sortBy(sortType, sortOrder);
 
-      _entities.value = _dirEntities + _fileEntities;
-    } finally {}
+    return dirEntities + fileEntities;
   }
 
-  void sort() {
-    _dirEntities = _dirEntities.sortBy(_sortType.value, _sortOrder.value);
-    _fileEntities = _fileEntities.sortBy(_sortType.value, _sortOrder.value);
-
-    _entities.value = _dirEntities + _fileEntities;
+  void updateFileSystemList() {
+    update(['FileSystemList']);
   }
 
-  void newFile(String newName) {
-    final path = currentPath;
+  void addHistory(String path) => _history.add(path);
 
-    if (newName.isEmpty) {
+  void removeLastHistory() => _history.removeLast();
+
+  bool get isHistoryEmpty => _history.isEmpty;
+
+  String get lastHistory => _history.last;
+
+  void newFile(String name) async {
+    if (name.isEmpty) {
       throw FileManagerException('Empty name.');
     }
 
-    if (newName.contains(RegExp(r'[\/:*?"<>|]'))) {
+    if (name.contains(RegExp(r'[\/:*?"<>|]'))) {
       throw FileManagerException('Illegal name.');
     }
 
-    File newFile = File(p.join(path, newName));
+    File newFile = File(p.join(currentPath, name));
 
-    newFile.createSync();
+    await newFile.create();
   }
 
-  void newFolder(String newName) {
-    final path = currentPath;
-
-    if (newName.isEmpty) {
+  void newFolder(String name) async {
+    if (name.isEmpty) {
       throw FileManagerException('Empty name.');
     }
 
-    if (newName.contains(RegExp(r'[\/:*?"<>|]'))) {
+    if (name.contains(RegExp(r'[\/:*?"<>|]'))) {
       throw FileManagerException('Illegal name.');
     }
 
-    Directory newDir = Directory(p.join(path, newName));
+    Directory newDir = Directory(p.join(currentPath, name));
 
-    newDir.createSync();
+    await newDir.create();
   }
 
-  void rename(String newName, FileSystemEntity entity) {
-    final path = currentPath;
-
+  void rename(String newName, FileSystemEntity entity) async {
     if (!entity.existsSync()) {
       throw FileManagerException('No such file or directory.');
     }
@@ -165,22 +137,19 @@ class FileManagerController extends GetxController {
       throw FileManagerException('Illegal name.');
     }
 
-    entity.renameSync(p.join(path, newName));
+    await entity.rename(p.join(currentPath, newName));
   }
 
-  void delete(FileSystemEntity entity) {
+  void delete(FileSystemEntity entity) async {
     if (!entity.existsSync()) {
       throw FileManagerException('No such file or directory.');
     }
 
-    entity.deleteSync(recursive: true);
+    await entity.delete(recursive: true);
   }
 
-  @override
-  void refresh() {
-    entities.clear();
-    getEntities();
-    super.refresh();
+  void playVideo(String path) {
+    Get.toNamed(AppRoutes.videoPlayer, parameters: {'path': path});
   }
 }
 
@@ -191,6 +160,6 @@ class FileManagerException implements Exception {
 
   @override
   String toString() {
-    return '$FileManagerException: $msg';
+    return 'FileManagerException: $msg';
   }
 }

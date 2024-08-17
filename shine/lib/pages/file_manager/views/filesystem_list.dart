@@ -9,26 +9,55 @@ import 'package:get/get.dart';
 
 // Project imports:
 import 'package:shine/pages/file_manager/controllers/file_manager_controller.dart';
+import 'package:shine/widgets/shine_logo.dart';
 import 'filesystem_block.dart';
 
 class FileSystemList extends GetView<FileManagerController> {
-  const FileSystemList({super.key, required this.entities});
-
-  final List<FileSystemEntity> entities;
+  const FileSystemList({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
-      child: ListView.builder(
-        padding: const EdgeInsets.only(bottom: 100),
-        primary: true,
-        itemBuilder: itemBuilder,
-        itemCount: entities.length,
+      child: GetBuilder<FileManagerController>(
+        id: 'FileSystemList',
+        builder: (logic) {
+          return FutureBuilder<List<FileSystemEntity>>(
+              future: controller.getEntities(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 100),
+                    primary: true,
+                    itemBuilder: (context, index) => itemBuilder(
+                      context,
+                      index,
+                      snapshot.data!,
+                    ),
+                    itemCount: snapshot.data!.length,
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: SelectableText(
+                      snapshot.error.toString(),
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                  );
+                } else {
+                  return const Center(
+                    child: ShineLogo(size: 60),
+                  );
+                }
+              });
+        },
       ),
     );
   }
 
-  Widget? itemBuilder(BuildContext context, int index) {
+  Widget? itemBuilder(
+    BuildContext context,
+    int index,
+    List<FileSystemEntity> entities,
+  ) {
     if (entities.isEmpty) return null;
 
     return FileSystemBlock(

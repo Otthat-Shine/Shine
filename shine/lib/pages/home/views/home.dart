@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:path/path.dart' as p;
 
 // Project imports:
-import 'package:shine/common/general_dialog.dart';
+import 'package:shine/common/dialogs.dart';
 import 'package:shine/generated/assets.dart';
 import 'package:shine/generated/pubspec.dart';
 import 'package:shine/routes/app_pages.dart';
@@ -22,6 +21,7 @@ class Home extends GetView<HomeController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shine'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: const [
           _OtherOptions(),
         ],
@@ -31,7 +31,7 @@ class Home extends GetView<HomeController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () async => await _createConcertFile(context),
+              onPressed: () async => await createConcertFile(context),
               child: const Text('Create Concert File'),
             ),
             const SizedBox(height: 20),
@@ -45,7 +45,7 @@ class Home extends GetView<HomeController> {
     );
   }
 
-  Future<void> _createConcertFile(BuildContext context) async {
+  Future<void> createConcertFile(BuildContext context) async {
     CreateConcertForm concertForm = CreateConcertForm();
     await concertForm.show(context);
 
@@ -55,16 +55,16 @@ class Home extends GetView<HomeController> {
 
     try {
       await controller.createConcertFile(
-        concertForm.files,
-        p.join(concertForm.dest, '${concertForm.name}.concert'),
-        concertForm.password,
+        concertForm.files!,
+        concertForm.dest!,
+        concertForm.password!,
       );
 
       EasyLoading.dismiss();
       EasyLoading.showSuccess('Create successfully');
     } catch (e) {
       EasyLoading.dismiss();
-      GeneralDialog.errorDialog(e.toString());
+      Dialogs.error(e.toString());
       return;
     }
   }
@@ -79,23 +79,28 @@ class Home extends GetView<HomeController> {
 
     try {
       await controller.extractConcertFile(
-        concertForm.concertFile,
-        concertForm.dest,
-        concertForm.password,
+        concertForm.concertFile!,
+        concertForm.dest!,
+        concertForm.password!,
       );
 
       EasyLoading.dismiss();
       EasyLoading.showSuccess('Extract successfully');
     } catch (e) {
       EasyLoading.dismiss();
-      GeneralDialog.errorDialog(e.toString());
+      Dialogs.error(e.toString());
       return;
     }
 
     Get.toNamed(
       AppRoutes.fileManager,
       preventDuplicates: false,
-      arguments: {'enableConcert': true, 'path': concertForm.dest},
+      arguments: {
+        'path': concertForm.dest!.path,
+        'enableConcert': true,
+        'concertFile': concertForm.concertFile,
+        'concertExtDir': concertForm.dest,
+      },
     );
   }
 }
